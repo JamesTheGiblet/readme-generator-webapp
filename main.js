@@ -323,6 +323,29 @@ function setupGitHubValidation() {
     });
 }
 
+/**
+ * Attaches event listeners to the interactive elements of the generator.
+ */
+function setupEventListeners() {
+    // Form submission
+    document.getElementById('readmeForm')?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        generateReadme();
+    });
+
+    // Navigation buttons
+    document.getElementById('nextStep1')?.addEventListener('click', nextStep);
+    document.getElementById('nextStep2')?.addEventListener('click', nextStep);
+    document.getElementById('prevStep2')?.addEventListener('click', prevStep);
+    document.getElementById('prevStep3')?.addEventListener('click', prevStep);
+
+    // Action buttons in step 4
+    document.getElementById('copyReadmeBtn')?.addEventListener('click', copyReadme);
+    document.getElementById('downloadReadmeBtn')?.addEventListener('click', downloadReadme);
+    document.getElementById('editReadmeBtn')?.addEventListener('click', editReadme);
+    document.getElementById('startOverBtn')?.addEventListener('click', startOver);
+    document.getElementById('shareReadmeBtn')?.addEventListener('click', shareReadme);
+}
 // --- Initialization Functions ---
 
 /**
@@ -444,6 +467,7 @@ function loadTool(templateId, initFunctionName) {
 function initializeGeneratorScripts() {
     updateStepAndProgress();
     setupGitHubValidation();
+    setupEventListeners();
 }
 
 /**
