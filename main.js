@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainNav = document.getElementById('mainNav');
     const copyToastEl = document.getElementById('copy-toast');
     const copyToast = new bootstrap.Toast(copyToastEl);
+    const examplesModal = document.getElementById('examplesModal');
 
     // --- State Management ---
     let currentStep = 0;
@@ -224,16 +225,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 1. Detect Project Type from file structure
             githubStatus.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"></div> Detecting project type...`;
-            const detectedType = detectProjectType(fileNames);
+            let detectedType = detectProjectType(fileNames);
+
+            // 2. Analyze description text if no type was found from files
+            if (!detectedType && repoData.description) {
+                const detectedFromDesc = detectProjectTypeFromDescription(repoData.description);
+                if (detectedFromDesc) {
+                    detectedType = detectedFromDesc;
+                }
+            }
+
+            // 3. Auto-populate suggestions based on detected type
             if (detectedType) {
                 setFieldValue('projectType', detectedType);
-                // 2. Auto-populate suggestions based on detected type
                 // We call this directly, bypassing the confirmation prompt for a smoother UX.
                 const suggestions = suggestionsData[detectedType];
                 if (suggestions) {
                     setFieldValue('techStack', suggestions.techStack);
                     setFieldValue('projectTools', suggestions.tools);
                     setFieldValue('installation', suggestions.setup);
+                    setFieldValue('features', suggestions.features);
                 }
             } else {
                 // If no type detected, use languages from API as a fallback
@@ -307,6 +318,38 @@ document.addEventListener('DOMContentLoaded', () => {
         return ''; // Default if no specific files are found
     }
 
+/**
+ * Detects the project type by analyzing keywords in the project description.
+ * @param {string} description - The project description text.
+ * @returns {string} The detected project type or an empty string.
+ */
+function detectProjectTypeFromDescription(description) {
+    if (!description) return '';
+    const descLower = description.toLowerCase();
+
+    // Define keywords for each project type.
+    // Order from more specific to more general if there's overlap.
+    const typeKeywords = {
+        'Mobile Application': ['mobile app', 'ios app', 'android app', 'flutter app', 'react native'],
+        'Desktop Application': ['desktop app', 'desktop application', 'electron app', 'wpf', 'winforms', 'macos app'],
+        'CLI Tool': ['cli', 'command-line', 'command line', 'terminal tool'],
+        'Web Application': ['web app', 'web application', 'website', 'single page application', 'spa'],
+        'Library / Framework': ['library', 'framework', 'package', 'module'],
+        'Data Science Project': ['data science', 'machine learning', 'deep learning', 'jupyter'],
+        'Game': ['game', 'unity game', 'unreal engine game'],
+    };
+
+    for (const type in typeKeywords) {
+        for (const keyword of typeKeywords[type]) {
+            if (descLower.includes(keyword)) {
+                return type; // Return the first match
+            }
+        }
+    }
+
+    return ''; // No keywords found
+}
+
     /**
      * Fetches the suggestion data from the JSON file.
      */
@@ -340,7 +383,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const fieldsToUpdate = {
             techStack: suggestions.techStack,
             projectTools: suggestions.tools,
-            installation: suggestions.setup
+            installation: suggestions.setup,
+            features: suggestions.features
         };
 
         const targetInputs = {};
@@ -423,6 +467,48 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             mainNav.classList.remove('navbar-scrolled');
         }
+    }
+
+    // --- Logic for examples modal ---
+    if (examplesModal) {
+        const exampleTabs = examplesModal.querySelectorAll('.nav-link[data-bs-toggle="tab"]');
+
+        const loadExampleContent = async (tab) => {
+            const targetPaneId = tab.getAttribute('data-bs-target');
+            const targetPane = document.querySelector(targetPaneId);
+            
+            // Only load if it hasn't been loaded yet (check for spinner)
+            if (targetPane && targetPane.querySelector('.spinner-border')) {
+                const path = tab.dataset.examplePath;
+                try {
+                    const response = await fetch(path);
+                    if (!response.ok) {
+                        throw new Error(`Failed to load ${path}`);
+                    }
+                    const markdown = await response.text();
+                    // Use a custom class for the preview content inside the modal
+                    targetPane.innerHTML = `<div class="readme-preview-content">${marked.parse(markdown)}</div>`;
+                } catch (error) {
+                    console.error(error);
+                    targetPane.innerHTML = `<div class="alert alert-danger">Could not load example. Please ensure the file exists at '${path}'.</div>`;
+                }
+            }
+        };
+
+        // Load content for the initially active tab when the modal is shown for the first time
+        examplesModal.addEventListener('shown.bs.modal', () => {
+            const activeTab = examplesModal.querySelector('.nav-link.active');
+            if (activeTab) {
+                loadExampleContent(activeTab);
+            }
+        }, { once: true });
+
+        // Add event listeners to other tabs to load content when they become active
+        exampleTabs.forEach(tab => {
+            tab.addEventListener('shown.bs.tab', (event) => {
+                loadExampleContent(event.target);
+            });
+        });
     }
 
     // --- Event Listeners ---

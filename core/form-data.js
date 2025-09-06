@@ -49,13 +49,10 @@ const formSteps = [
                     const techs = value.split(',').map(tech => tech.trim()).filter(Boolean);
                     if (techs.length === 0) return "";
                     return techs.map(tech => {
-                        const badgeText = encodeURIComponent(tech.replace(/-/g, '--'));
-                        const logoName = tech.toLowerCase().replace(/ /g, '').replace(/\./g, 'dot').replace(/\+/g, 'plus').replace(/#/g, 'sharp').replace('c#', 'csharp').replace('++', 'plusplus');
-                        const badgeColor = '2d2d2d'; // A neutral color
-
-                        // Construct a full, valid shields.io URL for the badge
-                        const url = `https://img.shields.io/badge/${badgeText}-${badgeColor}?style=for-the-badge&logo=${logoName}&logoColor=white`;
-                        return `![${tech}](${url})`;
+                        const techName = tech.trim();
+                        const badgeColor = getTechBadgeColor(techName);
+                        const logoName = getTechLogoName(techName);
+                        return `![${techName}](https://img.shields.io/badge/${encodeURIComponent(techName)}-${badgeColor}?style=for-the-badge&logo=${logoName}&logoColor=white)`;
                     }).join(' ');
                 }
             },
@@ -74,11 +71,22 @@ const formSteps = [
                 id: "features",
                 label: "Key Features",
                 type: "textarea",
-                placeholder: "Live Preview\nGitHub Analysis\nAuto-Save Progress",
-                helpText: "List the key features of your project, one per line. We'll format it as a list for you.",
+                placeholder: "Feature 1\nFeature 2\nFeature 3",
+                helpText: "List the key features of your project, one per line.",
                 formatter: (value) => {
                     if (!value) return "";
-                    return value.split('\n').map(line => line.trim()).filter(Boolean).map(line => `- ${line}`).join('\n');
+                    // Split by lines and ensure each line starts with a bullet point
+                    return value.split('\n')
+                        .map(line => line.trim())
+                        .filter(line => line.length > 0)
+                        .map(line => {
+                            // If line doesn't start with -, *, or +, add a dash
+                            if (!line.match(/^[-*+]\s/)) {
+                                return `- ${line}`;
+                            }
+                            return line;
+                        })
+                        .join('\n');
                 }
             }
         ]
@@ -138,3 +146,77 @@ const formSteps = [
         ]
     }
 ];
+
+// Helper function to get badge colors for different technologies
+function getTechBadgeColor(tech) {
+    const colors = {
+        'javascript': '%23F7DF1E',
+        'typescript': '%233178C6',
+        'react': '%2361DAFB',
+        'vue.js': '%234FC08D',
+        'angular': '%23DD0031',
+        'node.js': '%23339933',
+        'python': '%233776AB',
+        'java': '%23ED8B00',
+        'c#': '%23239120',
+        'go': '%2300ADD8',
+        'rust': '%23000000',
+        'html': '%23E34F26',
+        'css': '%231572B6',
+        'sass': '%23CC6699',
+        'bootstrap': '%237952B3',
+        'tailwind': '%2338B2AC',
+        'express': '%23000000',
+        'django': '%23092E20',
+        'flask': '%23000000',
+        'mongodb': '%2347A248',
+        'postgresql': '%23336791',
+        'mysql': '%234479A1',
+        'redis': '%23DC382D',
+        'docker': '%232496ED',
+        'kubernetes': '%23326CE5',
+        'aws': '%23232F3E',
+        'azure': '%230078D4',
+        'gcp': '%234285F4'
+    };
+    
+    const techLower = tech.toLowerCase().replace(/\s+/g, '').replace('.', '');
+    return colors[techLower] || '%23333333';
+}
+
+// Helper function to get logo names for shields.io badges
+function getTechLogoName(tech) {
+    const logos = {
+        'javascript': 'javascript',
+        'typescript': 'typescript',
+        'react': 'react',
+        'vue.js': 'vuedotjs',
+        'angular': 'angular',
+        'node.js': 'nodedotjs',
+        'python': 'python',
+        'java': 'java',
+        'c#': 'csharp',
+        'go': 'go',
+        'rust': 'rust',
+        'html': 'html5',
+        'css': 'css3',
+        'sass': 'sass',
+        'bootstrap': 'bootstrap',
+        'tailwind': 'tailwindcss',
+        'express': 'express',
+        'django': 'django',
+        'flask': 'flask',
+        'mongodb': 'mongodb',
+        'postgresql': 'postgresql',
+        'mysql': 'mysql',
+        'redis': 'redis',
+        'docker': 'docker',
+        'kubernetes': 'kubernetes',
+        'aws': 'amazon-aws',
+        'azure': 'microsoft-azure',
+        'gcp': 'google-cloud'
+    };
+    
+    const techLower = tech.toLowerCase().replace(/\s+/g, '').replace('.', '');
+    return logos[techLower] || tech.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
