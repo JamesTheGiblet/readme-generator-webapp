@@ -1,0 +1,37 @@
+{
+  "Web Application": {
+    "techStack": "HTML, CSS, JavaScript, TypeScript, React, Angular, Vue.js, Node.js, Express, Django, Ruby on Rails",
+    "tools": "VS Code, Webpack, Babel, npm, Git, Docker",
+    "setup": "A typical setup involves a frontend framework, a backend API, and a database. Continuous integration and deployment (CI/CD) pipelines are common."
+  },
+  "Mobile Application": {
+    "techStack": "Swift, SwiftUI, Kotlin, Jetpack Compose, React Native, Flutter, Dart, Xamarin",
+    "tools": "Xcode, Android Studio, VS Code, Gradle, CocoaPods, Fastlane",
+    "setup": "Development is done using platform-specific SDKs (iOS, Android) or cross-platform frameworks. App store submission requires following specific guidelines."
+  },
+  "Desktop Application": {
+    "techStack": "Electron, C#, .NET, WPF, Java, JavaFX, Python, PyQt, Tkinter, C++, Qt",
+    "tools": "VS Code, Visual Studio, JetBrains Rider, Eclipse, Qt Creator",
+    "setup": "Choose a framework like Electron for cross-platform web-based apps, or native frameworks like .NET for Windows or Swift for macOS."
+  },
+  "CLI Tool": {
+    "techStack": "Python, Go, Rust, Bash, Node.js, Deno",
+    "tools": "Vim, VS Code, GoLand, PyCharm, Makefiles, Homebrew",
+    "setup": "Focus on argument parsing, standard I/O handling, and creating an executable that can be placed in the system's PATH for easy access."
+  },
+  "Data Science Project": {
+    "techStack": "Python, R, SQL, Jupyter, Pandas, NumPy, Scikit-learn, TensorFlow, PyTorch",
+    "tools": "Jupyter Notebook, JupyterLab, VS Code, RStudio, DBeaver, Anaconda",
+    "setup": "Projects often start with data exploration in notebooks. Using virtual environments (like conda) is crucial for managing dependencies."
+  },
+  "Game": {
+    "techStack": "C++, C#, Unity, Unreal Engine, Godot, GDScript, Lua",
+    "tools": "Unity Hub, Unreal Editor, Visual Studio, Blender, Aseprite, FMOD",
+    "setup": "Game development is heavily reliant on a chosen game engine, which provides tools for rendering, physics, and asset management."
+  },
+  "Other": {
+    "techStack": "",
+    "tools": "",
+    "setup": ""
+  }
+}

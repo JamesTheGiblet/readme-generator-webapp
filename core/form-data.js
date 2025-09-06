@@ -1,29 +1,124 @@
-/**
- * Gathers all data from the form fields.
- * @returns {object} An object containing all form data.
- */
-export function getReadmeData() {
-    return {
-        projectName: document.getElementById('projectName')?.value || '',
-        description: document.getElementById('description')?.value || '',
-        version: document.getElementById('version')?.value || '',
-        primaryLanguage: document.getElementById('primaryLanguage')?.value || '',
-        projectType: document.getElementById('projectType')?.value || '',
-        githubUrl: document.getElementById('githubUrl')?.value || '',
-        keyFeatures: document.getElementById('keyFeatures')?.value || '',
-        installation: document.getElementById('installation')?.value || '',
-        usage: document.getElementById('usage')?.value || '',
-        license: document.getElementById('license')?.value || '',
-        author: document.getElementById('author')?.value || '',
-        email: document.getElementById('email')?.value || '',
-        website: document.getElementById('website')?.value || '',
-        tone: document.getElementById('tone')?.value || 'professional',
-        includeBadges: document.getElementById('includeBadges')?.checked || false,
-        includeContributing: document.getElementById('contributing')?.checked || false,
-        includeChangelog: document.getElementById('changelog')?.checked || false,
-        includeRoadmap: document.getElementById('roadmap')?.checked || false,
-        includeFaq: document.getElementById('faq')?.checked || false,
-        includeAcknowledgments: document.getElementById('acknowledgments')?.checked || false,
-        includeScreenshots: document.getElementById('screenshots')?.checked || false,
-    };
-}
+const formSteps = [
+    {
+        title: "Project Basics",
+        fields: [
+            {
+                id: "projectTitle",
+                label: "Project Title",
+                type: "text",
+                placeholder: "e.g., Praximous README Generator",
+                required: true,
+                helpText: "The main title of your project."
+            },
+            {
+                id: "projectDescription",
+                label: "Project Description",
+                type: "textarea",
+                placeholder: "A short and catchy description of your project.",
+                required: true,
+                helpText: "A one-paragraph description of your project's purpose and value."
+            },
+            {
+                id: "projectType",
+                label: "Project Type / Platform (Optional)",
+                type: "select",
+                options: ["", "Web Application", "Mobile Application", "Desktop Application", "CLI Tool", "Library / Framework", "Data Science Project", "Game", "Other"],
+                required: false,
+                helpText: "What kind of project is this?"
+            },
+            {
+                id: "liveDemoUrl",
+                label: "Live Demo URL (Optional)",
+                type: "url",
+                placeholder: "https://example.com",
+                helpText: "Link to a live demo of your project.",
+            }
+        ]
+    },
+    {
+        title: "Technical Details",
+        fields: [
+            {
+                id: "techStack",
+                label: "Languages & Frameworks",
+                type: "textarea",
+                placeholder: "e.g., JavaScript, React, Node.js, CSS",
+                helpText: "Comma-separated list. This will be auto-filled when you select a Project Type.",
+                formatter: (value) => {
+                    if (!value || typeof value !== "string") return "";
+                    const techs = value.split(',').map(tech => tech.trim()).filter(Boolean);
+                    if (techs.length === 0) return "";
+                    return techs.map(tech => {
+                        const badgeText = encodeURIComponent(tech);
+                        const logoName = tech.toLowerCase().replace(/ /g, '-').replace(/\./g, 'dot').replace(/\+/g, 'plus').replace('#', 'sharp').replace('c#', 'csharp');
+                        return `!${tech}`;
+                    }).join(' ');
+                }
+            },
+            {
+                id: "projectTools",
+                label: "Development Tools",
+                type: "textarea",
+                placeholder: "e.g., VS Code, Webpack, Docker",
+                helpText: "Comma-separated list of tools used. Auto-filled when you select a Project Type.",
+                formatter: (value) => {
+                    if (!value) return "";
+                    return value.split(',').map(tool => `* ${tool.trim()}`).join('\n');
+                }
+            },
+            {
+                id: "features",
+                label: "Key Features",
+                type: "textarea",
+                placeholder: "- Feature 1\n- Feature 2\n- Feature 3",
+                helpText: "List the key features of your project, one per line."
+            }
+        ]
+    },
+    {
+        title: "Setup and Usage",
+        fields: [
+            {
+                id: "installation",
+                label: "Installation Instructions",
+                type: "textarea",
+                placeholder: "1. Clone the repo\n   ```sh\n   git clone https://github.com/your_username/your_project.git\n   ```\n2. Install NPM packages\n   ```sh\n   npm install\n   ```",
+                helpText: "Provide step-by-step instructions. This will be auto-filled with a template when you select a Project Type.",
+            },
+            {
+                id: "usage",
+                label: "Usage Guide",
+                type: "textarea",
+                placeholder: "Provide examples of how to use your project.",
+                helpText: "Explain how to use your project after installation."
+            }
+        ]
+    },
+    {
+        title: "Final Touches",
+        fields: [
+            {
+                id: "contributing",
+                label: "Contributing Guidelines",
+                type: "textarea",
+                placeholder: "Contributions are what make the open source community such an amazing place... We welcome contributions!",
+                helpText: "Explain how others can contribute to your project."
+            },
+            {
+                id: "license",
+                label: "License",
+                type: "select",
+                options: ["MIT", "GPLv3", "Apache 2.0", "Unlicensed"],
+                helpText: "Choose a license for your project."
+            },
+            {
+                id: "readmeTone",
+                label: "README Tone",
+                type: "select",
+                options: ["Professional", "Friendly", "Concise"],
+                required: false,
+                helpText: "Select the overall tone for the generated README."
+            }
+        ]
+    }
+];

@@ -1,544 +1,286 @@
-import { buildReadmeContent } from './core/engine.js';
-import { getReadmeData } from './core/form-data.js';
+document.addEventListener('DOMContentLoaded', () => {
+    // --- DOM Element Selectors ---
+    const formContainer = document.getElementById('readme-form');
+    const progressBar = document.getElementById('progress-bar');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const previewContainer = document.getElementById('preview-container');
+    const copyBtn = document.getElementById('copy-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const themeToggle = document.getElementById('theme-toggle');
+    const mainNav = document.getElementById('mainNav');
+    const copyToastEl = document.getElementById('copy-toast');
+    const copyToast = new bootstrap.Toast(copyToastEl);
 
-// --- Global State ---
-let currentStep = 1;
-const totalSteps = 4;
-let darkMode = false;
+    // --- State Management ---
+    let currentStep = 0;
+    let generatedMarkdown = '';
+    let suggestionsData = {};
 
-// --- Global Functions (callable from HTML via onclick) ---
+    // --- Functions ---
 
-function updateStepAndProgress() {
-    const progressBar = document.getElementById('progressBar');
-    if (!progressBar) return;
+    /**
+     * Dynamically builds the form steps from the form-data.js configuration.
+     */
+    function buildForm() {
+        formSteps.forEach((step, index) => {
+            const stepDiv = document.createElement('div');
+            stepDiv.classList.add('form-step');
+            if (index === 0) stepDiv.classList.add('active');
 
-    document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
-    const activeStep = document.getElementById(`step${currentStep}`);
-    if (activeStep) {
-        activeStep.classList.add('active');
+            step.fields.forEach(field => {
+                const formGroup = document.createElement('div');
+                formGroup.classList.add('mb-3');
+
+                let inputHtml = '';
+                const commonAttrs = `id="${field.id}" class="form-control" ${field.required ? 'required' : ''} aria-label="${field.label}"`;
+
+                if (field.type === 'textarea') {
+                    inputHtml = `<textarea ${commonAttrs} rows="4" placeholder="${field.placeholder || ''}"></textarea>`;
+                } else if (field.type === 'select') {
+                    const options = field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                    inputHtml = `<select ${commonAttrs}>${options}</select>`;
+                } else {
+                    inputHtml = `<input type="${field.type}" ${commonAttrs} placeholder="${field.placeholder || ''}">`;
+                }
+
+                formGroup.innerHTML = `
+                    <label for="${field.id}" class="form-label">${field.label}</label>
+                    ${inputHtml}
+                    ${field.helpText ? `<div class="form-text">${field.helpText}</div>` : ''}
+                `;
+
+                stepDiv.appendChild(formGroup);
+            });
+            formContainer.appendChild(stepDiv);
+        });
     }
 
-    const progress = (currentStep / totalSteps) * 100;
-    progressBar.style.width = `${progress}%`;
-    progressBar.setAttribute('aria-valuenow', progress);
-}
+    /**
+     * Updates the live preview pane with the generated Markdown.
+     */
+    async function updatePreview() {
+        const formData = getFormData();
+        generatedMarkdown = await generateReadme(formData);
+        // Use marked.js to parse markdown into HTML
+        previewContainer.innerHTML = marked.parse(generatedMarkdown);
+    }
 
-function validateStep(stepNumber) {
-    const stepElement = document.getElementById(`step${stepNumber}`);
-    if (!stepElement) return false;
-    const requiredInputs = stepElement.querySelectorAll('[required]');
-    let allValid = true;
-    requiredInputs.forEach(input => {
-        if (!input.value.trim()) {
-            input.classList.add('is-invalid');
-            allValid = false;
-        } else {
-            input.classList.remove('is-invalid');
+    /**
+     * Updates the visibility of form steps and navigation buttons.
+     */
+    function updateFormStep() {
+        const steps = document.querySelectorAll('.form-step');
+        steps.forEach((step, index) => {
+            step.classList.toggle('active', index === currentStep);
+        });
+
+        prevBtn.style.display = currentStep === 0 ? 'none' : 'inline-block';
+        nextBtn.textContent = currentStep === steps.length - 1 ? 'Finish' : 'Next';
+
+        const progress = ((currentStep + 1) / steps.length) * 100;
+        progressBar.style.width = `${progress}%`;
+        progressBar.setAttribute('aria-valuenow', progress);
+    }
+
+    /**
+     * Handles navigation to the next step.
+     */
+    function nextStep() {
+        if (!validateCurrentStep()) {
+            return; // Stop if the current step is invalid
         }
-    });
-    if (!allValid) {
-        showToast('Please fill in all required fields.', 'warning');
-    }
-    return allValid;
-}
 
-function prevStep() {
-    if (currentStep <= 1) return;
-    currentStep--;
-    updateStepAndProgress();
-}
-
-function nextStep() {
-    if (currentStep >= totalSteps) return;
-
-    if (!validateStep(currentStep)) {
-        return;
-    }
-    currentStep++;
-    updateStepAndProgress();
-}
-
-function scrollToGenerator() {
-    const generatorEl = document.getElementById('generator');
-    if (generatorEl) {
-        generatorEl.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-
-function showPricing() { showToast('Pricing details coming soon!', 'info'); }
-function showDemo() { showToast('Demo video coming soon!', 'info'); }
-
-async function generateReadme() {
-    if (currentStep !== 3) return; // Only generate from step 3
-
-    if (!validateStep(currentStep)) {
-        return; // Stop if validation fails
+        if (currentStep < formSteps.length - 1) {
+            currentStep++;
+            updateFormStep();
+        } else {
+            // Handle form completion (e.g., show a summary or final actions)
+            alert('README generation complete! You can now copy or download the file.');
+        }
     }
 
-    currentStep++;
-    updateStepAndProgress(); // Manually advance to the preview step
+    /**
+     * Validates all required fields in the current step.
+     * @returns {boolean} - True if all required fields are filled, false otherwise.
+     */
+    function validateCurrentStep() {
+        let isStepValid = true;
+        const currentFields = formSteps[currentStep].fields;
 
-    const previewContainer = document.getElementById('readmePreview');
-    previewContainer.innerHTML = '<div class="d-flex align-items-center p-4"><strong role="status">Generating with AI...</strong><div class="spinner-border ms-auto" aria-hidden="true"></div></div>';
-
-    // Simulate AI generation
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network/AI delay
-
-    const data = getReadmeData();
-    const readmeContent = buildReadmeContent(data);
-
-    // Sanitize content for safe HTML display inside <pre> tag
-    const sanitizedContent = readmeContent.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    previewContainer.innerHTML = `<pre class="m-0">${sanitizedContent}</pre>`;
-}
-
-function copyReadme() {
-    const readmePreview = document.getElementById('readmePreview');
-    if (!readmePreview) return;
-    navigator.clipboard.writeText(readmePreview.innerText).then(() => showToast('README copied to clipboard!', 'success'), () => showToast('Failed to copy.', 'danger'));
-}
-
-function downloadReadme() {
-    const readmePreview = document.getElementById('readmePreview');
-    if (!readmePreview) return;
-
-    const readmeText = readmePreview.innerText;
-    const blob = new Blob([readmeText], { type: 'text/markdown' });
-    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'README.md' });
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    showToast('Downloading README.md...', 'success');
-}
-
-function editReadme() {
-    if (currentStep !== 4) return;
-    prevStep();
-    showToast('You can now edit your inputs again.', 'info');
-}
-
-function startOver() {
-    const readmeForm = document.getElementById('readmeForm');
-    if (readmeForm) {
-        readmeForm.reset();
-    }
-    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-    currentStep = 1;
-    updateStepAndProgress();
-
-    const readmePreview = document.getElementById('readmePreview');
-    if (readmePreview) {
-        readmePreview.innerHTML = '';
-    }
-    showToast('Form has been reset.', 'info');
-}
-
-function shareReadme() {
-    // Enhanced share functionality
-    const readmePreview = document.getElementById('readmePreview');
-    if (!readmePreview) return;
-
-    const readmeText = readmePreview.innerText;
-    const shareData = {
-        title: 'My Generated README',
-        text: 'Check out this README I generated with README Pro!',
-        url: window.location.href
-    };
-
-    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-        navigator.share(shareData).catch(() => {
-            fallbackShare(readmeText);
-        });
-    } else {
-        fallbackShare(readmeText);
-    }
-}
-
-function fallbackShare(readmeText) {
-    // Create a temporary shareable link (simulate backend)
-    const shareId = Math.random().toString(36).substring(2, 15);
-    const shareUrl = `${window.location.origin}/shared/${shareId}`;
-
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(shareUrl).then(() => {
-            showToast('Share link copied to clipboard!', 'success');
-        }).catch(() => {
-            showToast(`Share link: ${shareUrl}`, 'info');
-        });
-    } else {
-        showToast(`Share link: ${shareUrl}`, 'info');
-    }
-}
-
-// --- Helper Functions ---
-
-function showToast(message, type = 'primary') {
-    const toastContainer = document.querySelector('.toast-container');
-    if (!toastContainer) return;
-    const toastId = 'toast-' + Date.now();
-    const toastHTML = `<div id="${toastId}" class="toast align-items-center text-bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true"><div class="d-flex"><div class="toast-body">${message}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button></div></div>`;
-    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-    const toastEl = document.getElementById(toastId);
-    const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-    toast.show();
-    toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
-}
-
-/**
- * Updates the entire page theme (body class and icons). This function is safe to call on any page.
- * @param {boolean} isDark - True for dark mode, false for light mode.
- */
-function updateTheme(isDark) {
-    const body = document.body;
-    const themeIcon = document.querySelector('.theme-toggle i');
-
-    if (isDark) {
-        body.classList.add('dark-mode');
-        if (themeIcon) themeIcon.className = 'bi bi-sun-fill';
-    } else {
-        body.classList.remove('dark-mode');
-        if (themeIcon) themeIcon.className = 'bi bi-moon-fill';
-    }
-}
-
-/**
- * Toggles the theme and saves the user's preference.
- */
-function toggleDarkMode() {
-    darkMode = !document.body.classList.contains('dark-mode');
-    localStorage.setItem('darkMode', darkMode);
-    updateTheme(darkMode);
-    showToast(darkMode ? 'Dark mode enabled' : 'Light mode enabled', 'info');
-}
-
-/**
- * Initializes the dark mode on page load based on saved preference or system settings.
- */
-function initializeDarkMode() {
-    const savedMode = localStorage.getItem('darkMode');
-    if (savedMode !== null) {
-        darkMode = savedMode === 'true';
-    } else {
-        darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    updateTheme(darkMode);
-}
-
-// Enhanced analytics counter animation
-function animateCounters() {
-    const counters = document.querySelectorAll('.analytics-number');
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                animateCounter(entry.target);
-                observer.unobserve(entry.target);
+        currentFields.forEach(field => {
+            const inputElement = document.getElementById(field.id);
+            // The .is-invalid class is a Bootstrap class for styling validation errors.
+            if (field.required && !inputElement.value.trim()) {
+                inputElement.classList.add('is-invalid');
+                isStepValid = false;
+            } else {
+                inputElement.classList.remove('is-invalid');
             }
         });
-    }, {
-        threshold: 0.5
-    });
 
-    counters.forEach(counter => observer.observe(counter));
-}
-
-function animateCounter(element) {
-    const originalText = element.textContent;
-    const isRate = originalText.includes('/');
-    const isK = originalText.toLowerCase().includes('k');
-
-    let targetValue;
-    let suffix = '';
-
-    if (isRate) {
-        targetValue = parseFloat(originalText);
-        suffix = originalText.substring(originalText.indexOf('/'));
-    } else {
-        targetValue = parseFloat(originalText.replace(/,/g, ''));
-        if (isK) {
-            targetValue *= 1000;
-        }
-        suffix = originalText.replace(/[\d.,k]/gi, '');
+        return isStepValid;
     }
 
-    if (isNaN(targetValue)) {
-        element.textContent = originalText; // Restore original if parsing fails
-        return;
+    /**
+     * Handles navigation to the previous step.
+     */
+    function prevStep() {
+        if (currentStep > 0) {
+            currentStep--;
+            updateFormStep();
+        }
     }
 
-    const numericValue = targetValue;
-    const hasDecimal = originalText.includes('.');
-
-    let current = 0;
-    const increment = numericValue / 60; // 60 frames for smooth animation
-
-    const timer = setInterval(() => {
-        current += increment;
-        if (current >= numericValue) {
-            element.textContent = originalText;
-            clearInterval(timer);
-        } else {
-            const displayValue = hasDecimal ? current.toFixed(1) : Math.floor(current).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            element.textContent = displayValue + suffix;
+    /**
+     * Fetches the suggestion data from the JSON file.
+     */
+    async function loadSuggestions() {
+        try {
+            const response = await fetch('templates/suggestions.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            suggestionsData = await response.json();
+        } catch (error) {
+            console.error("Could not load templates/suggestions.json:", error);
+            // Disable suggester buttons if the file fails to load
+            document.querySelectorAll('.suggester-btn').forEach(btn => {
+                btn.disabled = true;
+                btn.title = "Could not load suggestions.";
+            });
         }
-    }, 16); // ~60fps
-}
+    }
 
-// Enhanced GitHub URL validation with more features
-function setupGitHubValidation() {
-    const githubUrlInput = document.getElementById('githubUrl');
-    const githubStatus = document.getElementById('githubStatus');
-    if (!githubUrlInput || !githubStatus) return;
-
-    let debounceTimer;
-    githubUrlInput.addEventListener('input', () => {
-        clearTimeout(debounceTimer);
-        const url = githubUrlInput.value.trim();
-
-        if (!url) {
-            githubStatus.innerHTML = '';
+    /**
+     * Handles populating form fields based on the selected project type.
+     * @param {string} projectType - The selected project type from the dropdown.
+     */
+    function handleProjectTypeChange(projectType) {
+        if (!projectType || !suggestionsData[projectType]) {
             return;
         }
 
-        githubStatus.innerHTML = '<div class="spinner-border spinner-border-sm text-secondary" role="status"></div>';
+        const suggestions = suggestionsData[projectType];
+        const fieldsToUpdate = {
+            techStack: suggestions.techStack,
+            projectTools: suggestions.tools,
+            installation: suggestions.setup
+        };
 
-        debounceTimer = setTimeout(() => {
-            const isValid = /^https:\/\/github\.com\/[a-zA-Z0-9-._]+\/[a-zA-Z0-9-._]+\/?$/.test(url);
-
-            if (isValid) {
-                githubStatus.innerHTML = '<i class="bi bi-check-circle-fill text-success" title="Valid GitHub URL"></i>';
-                showToast('Valid GitHub repository URL detected!', 'info');
-
-                // Auto-populate project name if empty
-                const projectNameInput = document.getElementById('projectName');
-                if (!projectNameInput.value) {
-                    const repoName = url.split('/').pop().replace('.git', '');
-                    projectNameInput.value = repoName.replace(/[-_]/g, ' ')
-                        .replace(/\b\w/g, l => l.toUpperCase());
-                }
-            } else {
-                githubStatus.innerHTML = '<i class="bi bi-x-circle-fill text-danger" title="Invalid GitHub URL"></i>';
-            }
-        }, 800);
-    });
-}
-
-/**
- * Attaches event listeners to the interactive elements of the generator.
- */
-function setupEventListeners() {
-    // Form submission
-    document.getElementById('readmeForm')?.addEventListener('submit', (event) => {
-        event.preventDefault();
-        generateReadme();
-    });
-
-    // Navigation buttons
-    document.getElementById('nextStep1')?.addEventListener('click', nextStep);
-    document.getElementById('nextStep2')?.addEventListener('click', nextStep);
-    document.getElementById('prevStep2')?.addEventListener('click', prevStep);
-    document.getElementById('prevStep3')?.addEventListener('click', prevStep);
-
-    // Action buttons in step 4
-    document.getElementById('copyReadmeBtn')?.addEventListener('click', copyReadme);
-    document.getElementById('downloadReadmeBtn')?.addEventListener('click', downloadReadme);
-    document.getElementById('editReadmeBtn')?.addEventListener('click', editReadme);
-    document.getElementById('startOverBtn')?.addEventListener('click', startOver);
-    document.getElementById('shareReadmeBtn')?.addEventListener('click', shareReadme);
-}
-// --- Initialization Functions ---
-
-/**
- * Initializes the entire application after the DOM is loaded.
- */
-function initializeApp() {
-    // Initialize dark mode first as it affects the whole page
-    initializeDarkMode();
-
-    // Listen for system theme changes to auto-update if no preference is set
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (localStorage.getItem('darkMode') === null) {
-            darkMode = e.matches;
-            updateTheme(darkMode);
-        }
-    });
-
-    // --- Page-specific initializations ---
-    // Check if we are on the main page by looking for a unique element.
-    // If so, run the initializers for the main page's complex components.
-    if (document.getElementById('tool-switcher')) {
-        initializeMainPage();
-    } else {
-        // If it's not the main portal page, it must be a tool page.
-        // We can directly initialize the generator scripts.
-        initializeGeneratorScripts();
-    }
-}
-
-function initializeMainPage() {
-    // Setup the tool switcher and load the default tool
-    initializeToolSwitcher();
-    // Initialize scroll-triggered animations for sections
-    initializeScrollAnimations();
-
-    // Initialize scroll-triggered effects (back-to-top button, navbar shrink)
-    initializeScrollEffects();
-
-    // Initialize analytics counter animation
-    setTimeout(animateCounters, 500); // Slight delay to ensure DOM is ready
-
-    // Add smooth scrolling to all anchor links
-    document.querySelectorAll('a[href^="#"]:not([data-bs-toggle])').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            // Ensure the href is more than just a '#' to avoid errors and scroll-to-top behavior
-            if (href.length > 1) {
-                const target = document.querySelector(href);
-                if (target) {
-                    e.preventDefault();
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+        const targetInputs = {};
+        let hasExistingContent = false;
+        for (const id in fieldsToUpdate) {
+            const input = document.getElementById(id);
+            if (input) {
+                targetInputs[id] = input;
+                if (input.value.trim() !== '') {
+                    hasExistingContent = true;
                 }
             }
-        });
-    });
-
-    console.log('Enhanced README Pro initialized successfully');
-}
-/**
- * Sets up the tool switching tabs and loads the default tool.
- */
-function initializeToolSwitcher() {
-    const toolSwitcher = document.getElementById('tool-switcher');
-    if (!toolSwitcher) return;
-
-    const tabs = toolSwitcher.querySelectorAll('[data-bs-toggle="tab"]');
-
-    tabs.forEach(tab => {
-        tab.addEventListener('shown.bs.tab', event => {
-            const templateId = event.target.dataset.toolTemplate;
-            const initFunction = event.target.dataset.toolInit;
-            if (templateId) {
-                loadTool(templateId, initFunction);
-            }
-        });
-    });
-
-    // Load the default tool initially
-    const activeTab = toolSwitcher.querySelector('.nav-link.active');
-    if (activeTab) {
-        const templateId = activeTab.dataset.toolTemplate;
-        const initFunction = activeTab.dataset.toolInit;
-        if (templateId) {
-            loadTool(templateId, initFunction);
-        }
-    }
-}
-
-/**
- * Loads a tool from a template into the main content area.
- * @param {string} templateId The ID of the <template> element to load.
- * @param {string} initFunctionName The name of the function to call to initialize the tool's scripts.
- */
-function loadTool(templateId, initFunctionName) {
-    const toolContentArea = document.getElementById('tool-content-area');
-    const template = document.getElementById(templateId);
-
-    if (!toolContentArea || !template) {
-        console.error(`Tool content area or template with id '${templateId}' not found!`);
-        toolContentArea.innerHTML = `<div class="alert alert-danger" role="alert"><strong>Error:</strong> Could not load the tool. Template is missing.</div>`;
-        return;
-    }
-
-    const templateContent = template.content.cloneNode(true);
-    toolContentArea.innerHTML = ''; // Clear previous tool or spinner
-    toolContentArea.appendChild(templateContent);
-
-    if (initFunctionName && typeof window[initFunctionName] === 'function') {
-        window[initFunctionName]();
-    }
-}
-
-/**
- * Initializes JavaScript functionality specific to the generator form.
- */
-function initializeGeneratorScripts() {
-    updateStepAndProgress();
-    setupGitHubValidation();
-    setupEventListeners();
-}
-
-/**
- * Initializes animations for elements that should fade in on scroll.
- */
-function initializeScrollAnimations() {
-    const scrollElements = document.querySelectorAll('.scroll-fade');
-
-    if (!scrollElements.length) return;
-
-    // Apply staggered delay to feature cards specifically
-    const featureCards = document.querySelectorAll('#features .row .scroll-fade');
-    featureCards.forEach((card, index) => {
-        card.style.transitionDelay = `${index * 100}ms`;
-    });
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            // When the element is in view, add the 'is-visible' class to trigger the animation
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                // Stop observing the element after it has become visible
-                observer.unobserve(entry.target);
-            }
-        });
-    }, {
-        threshold: 0.1, // Trigger when 10% of the element is visible
-        rootMargin: '0px 0px -50px 0px' // Start animation a bit before it's fully in view
-    });
-
-    scrollElements.forEach(el => observer.observe(el));
-}
-
-/**
- * Initializes effects that trigger on scroll, like the back-to-top button and navbar shrinking.
- */
-function initializeScrollEffects() {
-    const backToTopBtn = document.getElementById('backToTopBtn');
-    const navbar = document.querySelector('.navbar');
-    if (!navbar && !backToTopBtn) return;
-
-    // Handle scroll events
-    window.addEventListener('scroll', () => {
-        const scrollY = window.scrollY;
-
-        // Back to top button visibility
-        if (backToTopBtn) {
-            if (scrollY > 300) {
-                backToTopBtn.classList.add('show');
-            } else {
-                backToTopBtn.classList.remove('show');
-            }
         }
 
-        // Navbar shrink effect
-        if (navbar) {
-            if (scrollY > 50) {
-                navbar.classList.add('navbar-scrolled');
-            } else {
-                navbar.classList.remove('navbar-scrolled');
+        const canProceed = !hasExistingContent || confirm("This will overwrite existing content in related 'Tech', 'Tools', and 'Installation' fields. Are you sure?");
+
+        if (canProceed) {
+            for (const id in targetInputs) {
+                if (fieldsToUpdate[id] !== undefined) {
+                    targetInputs[id].value = fieldsToUpdate[id];
+                }
             }
         }
+    }
+    /**
+     * Copies the generated Markdown to the clipboard.
+     */
+    function copyMarkdown() {
+        navigator.clipboard.writeText(generatedMarkdown).then(() => {
+            copyToast.show();
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            alert('Failed to copy markdown.');
+        });
+    }
+
+    /**
+     * Triggers a download of the generated README.md file.
+     */
+    function downloadMarkdown() {
+        const blob = new Blob([generatedMarkdown], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'README.md';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    /**
+     * Toggles the light/dark theme.
+     */
+    function toggleTheme() {
+        const isDarkMode = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        themeToggle.innerHTML = isDarkMode ? '<i class="bi bi-moon-stars-fill"></i>' : '<i class="bi bi-sun-fill"></i>';
+    }
+
+    /**
+     * Applies the saved theme from localStorage on page load.
+     */
+    function applySavedTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggle.innerHTML = '<i class="bi bi-moon-stars-fill"></i>';
+        } else {
+            themeToggle.innerHTML = '<i class="bi bi-sun-fill"></i>';
+        }
+    }
+
+    /**
+     * Handles the navbar shrink effect on scroll.
+     */
+    function handleScroll() {
+        if (window.scrollY > 50) {
+            mainNav.classList.add('navbar-scrolled');
+        } else {
+            mainNav.classList.remove('navbar-scrolled');
+        }
+    }
+
+    // --- Event Listeners ---
+    nextBtn.addEventListener('click', nextStep);
+    prevBtn.addEventListener('click', prevStep);
+    copyBtn.addEventListener('click', copyMarkdown);
+    downloadBtn.addEventListener('click', downloadMarkdown);
+    themeToggle.addEventListener('click', toggleTheme);
+    window.addEventListener('scroll', handleScroll);
+
+    // Listen for input events to update preview and clear validation.
+    formContainer.addEventListener('input', async (event) => {
+        if (event.target.classList.contains('is-invalid')) {
+            event.target.classList.remove('is-invalid');
+        }
+
+        // If the project type is changed, trigger the suggestion logic.
+        if (event.target.id === 'projectType') {
+            // Do not await here, let it run in the background
+            handleProjectTypeChange(event.target.value);
+        }
+
+        await updatePreview();
     });
-}
 
-/**
- * Initializes JavaScript functionality specific to the DID Manager tool.
- */
-function initializeDidManagerScripts() {
-    console.log('DID Manager tool placeholder initialized.');
-    // Future JS for this tool will go here.
-}
+    // --- App Initialization ---
+    async function initializeApp() {
+        buildForm(); // Build form first to have buttons to disable on error
+        await loadSuggestions();
+        updateFormStep();
+        await updatePreview();
+        applySavedTheme();
+    }
 
-document.addEventListener('DOMContentLoaded', initializeApp);
+    initializeApp();
+});
