@@ -4,10 +4,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('progress-bar');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
-    const previewContainer = document.getElementById('preview-container');
     const copyBtn = document.getElementById('copy-btn');
     const downloadBtn = document.getElementById('download-btn');
     const themeToggle = document.getElementById('theme-toggle');
+    const githubUrlInput = document.getElementById('github-url');
+    const clearFormBtn = document.getElementById('clear-form-btn');
+    const generatorTitle = document.getElementById('generator-title');
+    const generatorModeTabs = document.getElementById('generatorModeTabs');
+    const generatorContent = document.getElementById('generator-content');
+    const resultContainer = document.getElementById('result-container');
+    const resultMarkdown = document.getElementById('result-markdown');
+    const startOverBtn = document.getElementById('start-over-btn');
+    const githubAnalysisContainer = document.getElementById('github-analysis-container');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const githubStatus = document.getElementById('github-status');
     const mainNav = document.getElementById('mainNav');
     const copyToastEl = document.getElementById('copy-toast');
     const copyToast = new bootstrap.Toast(copyToastEl);
@@ -18,6 +28,48 @@ document.addEventListener('DOMContentLoaded', () => {
     let suggestionsData = {};
 
     // --- Functions ---
+
+    /**
+     * Saves the current form data to localStorage.
+     */
+    function saveFormProgress() {
+        const formData = getFormData();
+        localStorage.setItem('readmeGeneratorProgress', JSON.stringify(formData));
+    }
+
+    /**
+     * Loads form data from localStorage and populates the fields.
+     */
+    function loadFormProgress() {
+        const savedData = localStorage.getItem('readmeGeneratorProgress');
+        if (savedData) {
+            const formData = JSON.parse(savedData);
+            let hasLoadedData = false;
+            for (const id in formData) {
+                const element = document.getElementById(id);
+                if (element && formData[id]) {
+                    element.value = formData[id];
+                    hasLoadedData = true;
+                }
+            }
+            if (hasLoadedData) {
+                console.log('Form progress restored from localStorage.');
+            }
+        }
+    }
+
+    /**
+     * Clears the form and removes the saved progress from localStorage.
+     */
+    function clearFormProgress() {
+        if (confirm('Are you sure you want to clear all fields? This will also remove your saved progress.')) {
+            localStorage.removeItem('readmeGeneratorProgress');
+            document.getElementById('readme-form').reset();
+            githubUrlInput.value = '';
+            githubStatus.innerHTML = '';
+            formContainer.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+        }
+    }
 
     /**
      * Dynamically builds the form steps from the form-data.js configuration.
@@ -57,16 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Updates the live preview pane with the generated Markdown.
-     */
-    async function updatePreview() {
-        const formData = getFormData();
-        generatedMarkdown = await generateReadme(formData);
-        // Use marked.js to parse markdown into HTML
-        previewContainer.innerHTML = marked.parse(generatedMarkdown);
-    }
-
-    /**
      * Updates the visibility of form steps and navigation buttons.
      */
     function updateFormStep() {
@@ -86,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * Handles navigation to the next step.
      */
-    function nextStep() {
+    async function nextStep() {
         if (!validateCurrentStep()) {
             return; // Stop if the current step is invalid
         }
@@ -95,8 +137,14 @@ document.addEventListener('DOMContentLoaded', () => {
             currentStep++;
             updateFormStep();
         } else {
-            // Handle form completion (e.g., show a summary or final actions)
-            alert('README generation complete! You can now copy or download the file.');
+            // Handle form completion
+            const formData = getFormData();
+            generatedMarkdown = await generateReadme(formData);
+            
+            resultMarkdown.value = generatedMarkdown;
+
+            generatorContent.classList.add('d-none');
+            resultContainer.classList.remove('d-none');
         }
     }
 
@@ -130,6 +178,133 @@ document.addEventListener('DOMContentLoaded', () => {
             currentStep--;
             updateFormStep();
         }
+    }
+
+    /**
+     * Analyzes a GitHub repository URL to pre-fill form fields.
+     */
+    async function analyzeRepo() {
+        const url = githubUrlInput.value.trim();
+        const githubRepoRegex = /^https?:\/\/github\.com\/([a-zA-Z0-9-._-]+)\/([a-zA-Z0-9-._-]+)\/?$/;
+        const match = url.match(githubRepoRegex);
+
+        if (!match) {
+            githubStatus.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Invalid GitHub repository URL.</span>`;
+            return;
+        }
+
+        const [, owner, repo] = match;
+        githubStatus.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"></div> Analyzing repository...`;
+        analyzeBtn.disabled = true;
+
+        try {
+            // Fetch repo details, languages, and root contents concurrently
+            const [repoRes, languagesRes, contentsRes] = await Promise.all([
+                fetch(`https://api.github.com/repos/${owner}/${repo}`),
+                fetch(`https://api.github.com/repos/${owner}/${repo}/languages`),
+                fetch(`https://api.github.com/repos/${owner}/${repo}/contents/`)
+            ]);
+
+            if (!repoRes.ok) {
+                throw new Error(`Failed to fetch repository data (Status: ${repoRes.status}). Check the URL and repository permissions.`);
+            }
+
+            const repoData = await repoRes.json();
+            const languagesData = languagesRes.ok ? await languagesRes.json() : {};
+            const contentsData = contentsRes.ok ? await contentsRes.json() : [];
+            const fileNames = contentsData.map(file => file.name);
+
+            // Helper to set value and trigger input event
+            const setFieldValue = (id, value) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = value;
+                }
+            };
+
+            // 1. Detect Project Type from file structure
+            githubStatus.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"></div> Detecting project type...`;
+            const detectedType = detectProjectType(fileNames);
+            if (detectedType) {
+                setFieldValue('projectType', detectedType);
+                // 2. Auto-populate suggestions based on detected type
+                // We call this directly, bypassing the confirmation prompt for a smoother UX.
+                const suggestions = suggestionsData[detectedType];
+                if (suggestions) {
+                    setFieldValue('techStack', suggestions.techStack);
+                    setFieldValue('projectTools', suggestions.tools);
+                    setFieldValue('installation', suggestions.setup);
+                }
+            } else {
+                // If no type detected, use languages from API as a fallback
+                setFieldValue('techStack', Object.keys(languagesData).join(', '));
+            }
+
+            // Populate form fields
+            setFieldValue('projectTitle', repoData.name.split(/[-_]/).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '));
+            setFieldValue('githubUsername', repoData.owner.login || '');
+
+            // Handle description: prefer repo description, fall back to README content
+            if (repoData.description) {
+                setFieldValue('projectDescription', repoData.description);
+            } else {
+                // If no description, try to fetch README content
+                githubStatus.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"></div> Analyzing... Fetching README...`;
+                const readmeRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/readme`);
+                if (readmeRes.ok) {
+                    const readmeData = await readmeRes.json();
+                    // Content is base64 encoded, so we need to decode it
+                    const decodedContent = atob(readmeData.content);
+                    setFieldValue('projectDescription', decodedContent);
+                } else {
+                    // No README found or other error, leave description blank
+                    setFieldValue('projectDescription', '');
+                }
+            }
+
+            const licenseInput = document.getElementById('license');
+            if (licenseInput && repoData.license?.spdx_id) {
+                const licenseOption = Array.from(licenseInput.options).find(opt => opt.value.toLowerCase().includes(repoData.license.spdx_id.toLowerCase()));
+                if (licenseOption) licenseInput.value = licenseOption.value;
+            }
+
+            // Trigger a single update for all fields
+            formContainer.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+
+            githubStatus.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill"></i> Repository analyzed successfully!</span>`;
+
+        } catch (error) {
+            githubStatus.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> ${error.message}</span>`;
+        } finally {
+            analyzeBtn.disabled = false;
+        }
+    }
+
+    /**
+     * Detects the project type based on the files in the repository root.
+     * @param {string[]} fileNames - An array of file names from the repo root.
+     * @returns {string} The detected project type or an empty string.
+     */
+    function detectProjectType(fileNames) {
+        // More specific checks first
+        if (fileNames.includes('pubspec.yaml')) return 'Mobile Application'; // Flutter
+        if (fileNames.some(f => f.endsWith('.uproject'))) return 'Game'; // Unreal Engine
+        if (fileNames.includes('ProjectSettings') && fileNames.some(f => f.endsWith('.unity'))) return 'Game'; // Unity
+        if (fileNames.some(f => f.endsWith('.sln'))) return 'Desktop Application'; // .NET
+        if (fileNames.includes('Cargo.toml')) return 'CLI Tool'; // Rust
+        if (fileNames.includes('go.mod')) return 'CLI Tool'; // Go
+
+        // Web and JS-related
+        if (fileNames.includes('package.json')) {
+            // Could be refined by actually reading the package.json, but this is a good start.
+            return 'Web Application';
+        }
+        if (fileNames.includes('requirements.txt') || fileNames.includes('Pipfile')) {
+            // Could be Django/Flask (Web) or a script (Data Science/CLI). A safe bet.
+            return 'Data Science Project';
+        }
+        if (fileNames.includes('Gemfile')) return 'Web Application'; // Ruby on Rails
+        return ''; // Default if no specific files are found
     }
 
     /**
@@ -255,8 +430,35 @@ document.addEventListener('DOMContentLoaded', () => {
     prevBtn.addEventListener('click', prevStep);
     copyBtn.addEventListener('click', copyMarkdown);
     downloadBtn.addEventListener('click', downloadMarkdown);
+    startOverBtn.addEventListener('click', () => {
+        resultContainer.classList.add('d-none');
+        generatorContent.classList.remove('d-none');
+        currentStep = 0;
+        updateFormStep();
+    });
     themeToggle.addEventListener('click', toggleTheme);
+    clearFormBtn.addEventListener('click', clearFormProgress);
+    analyzeBtn.addEventListener('click', analyzeRepo);
     window.addEventListener('scroll', handleScroll);
+
+    generatorModeTabs.addEventListener('click', (event) => {
+        event.preventDefault();
+        const clickedTab = event.target.closest('.nav-link');
+        if (!clickedTab) return;
+
+        const mode = clickedTab.dataset.mode;
+
+        generatorModeTabs.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
+        clickedTab.classList.add('active');
+
+        if (mode === 'github') {
+            githubAnalysisContainer.style.display = 'block';
+            generatorTitle.textContent = 'GitHub README Generator';
+        } else {
+            githubAnalysisContainer.style.display = 'none';
+            generatorTitle.textContent = 'README Generator';
+        }
+    });
 
     // Listen for input events to update preview and clear validation.
     formContainer.addEventListener('input', async (event) => {
@@ -270,15 +472,15 @@ document.addEventListener('DOMContentLoaded', () => {
             handleProjectTypeChange(event.target.value);
         }
 
-        await updatePreview();
+        saveFormProgress(); // Save progress on every input
     });
 
     // --- App Initialization ---
     async function initializeApp() {
         buildForm(); // Build form first to have buttons to disable on error
+        loadFormProgress(); // Load any saved progress from localStorage
         await loadSuggestions();
         updateFormStep();
-        await updatePreview();
         applySavedTheme();
     }
 

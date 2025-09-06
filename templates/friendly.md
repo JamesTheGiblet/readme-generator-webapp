@@ -57,3 +57,9 @@ We love contributions from the community!
 
 This project is licensed under the {{license}} License. Feel free to use it!
 {{/if}}
+
+{{#if githubUsername}}
+## 💬 Get in Touch
+
+Find me on GitHub: @{{githubUsername}}
+{{/if}}

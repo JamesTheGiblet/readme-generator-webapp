@@ -41,3 +41,8 @@
 ## License
 Licensed under the {{license}} License.
 {{/if}}
+
+{{#if githubUsername}}
+## Contact
+GitHub: @{{githubUsername}}
+{{/if}}

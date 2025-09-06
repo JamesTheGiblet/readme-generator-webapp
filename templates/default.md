@@ -46,3 +46,8 @@ Check out the live demo: [{{liveDemoUrl}}]({{liveDemoUrl}})
 ## 📄 License
 This project is licensed under the {{license}} License.
 {{/if}}
+
+{{#if githubUsername}}
+## 👤 Contact
+GitHub: @{{githubUsername}}
+{{/if}}

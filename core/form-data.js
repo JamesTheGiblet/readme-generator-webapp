@@ -49,9 +49,13 @@ const formSteps = [
                     const techs = value.split(',').map(tech => tech.trim()).filter(Boolean);
                     if (techs.length === 0) return "";
                     return techs.map(tech => {
-                        const badgeText = encodeURIComponent(tech);
-                        const logoName = tech.toLowerCase().replace(/ /g, '-').replace(/\./g, 'dot').replace(/\+/g, 'plus').replace('#', 'sharp').replace('c#', 'csharp');
-                        return `!${tech}`;
+                        const badgeText = encodeURIComponent(tech.replace(/-/g, '--'));
+                        const logoName = tech.toLowerCase().replace(/ /g, '').replace(/\./g, 'dot').replace(/\+/g, 'plus').replace(/#/g, 'sharp').replace('c#', 'csharp').replace('++', 'plusplus');
+                        const badgeColor = '2d2d2d'; // A neutral color
+
+                        // Construct a full, valid shields.io URL for the badge
+                        const url = `https://img.shields.io/badge/${badgeText}-${badgeColor}?style=for-the-badge&logo=${logoName}&logoColor=white`;
+                        return `![${tech}](${url})`;
                     }).join(' ');
                 }
             },
@@ -70,8 +74,12 @@ const formSteps = [
                 id: "features",
                 label: "Key Features",
                 type: "textarea",
-                placeholder: "- Feature 1\n- Feature 2\n- Feature 3",
-                helpText: "List the key features of your project, one per line."
+                placeholder: "Live Preview\nGitHub Analysis\nAuto-Save Progress",
+                helpText: "List the key features of your project, one per line. We'll format it as a list for you.",
+                formatter: (value) => {
+                    if (!value) return "";
+                    return value.split('\n').map(line => line.trim()).filter(Boolean).map(line => `- ${line}`).join('\n');
+                }
             }
         ]
     },
@@ -103,6 +111,14 @@ const formSteps = [
                 type: "textarea",
                 placeholder: "Contributions are what make the open source community such an amazing place... We welcome contributions!",
                 helpText: "Explain how others can contribute to your project."
+            },
+            {
+                id: "githubUsername",
+                label: "GitHub Username (Optional)",
+                type: "text",
+                placeholder: "e.g., JamesTheGiblet",
+                helpText: "Your GitHub username for the contact section.",
+                required: false
             },
             {
                 id: "license",

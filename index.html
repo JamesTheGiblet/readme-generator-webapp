@@ -48,52 +48,119 @@
     <!-- Generator Section -->
     <main id="generator" class="generator-section">
         <div class="container">
-            <div class="row g-5">
-                <!-- Form Column -->
-                <div class="col-lg-6">
-                    <div class="form-container">
-                        <h2 class="mb-4">README Generator</h2>
-                        
-                        <!-- Progress Bar -->
-                        <div class="progress custom-progress-height mb-4">
-                            <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" title="Form completion progress"></div>
-                        </div>
-
-                        <!-- Form Steps Container -->
-                        <form id="readme-form" novalidate>
-                            <!-- Form steps will be dynamically inserted here by main.js -->
-                        </form>
-
-                        <!-- Navigation Buttons -->
-                        <div class="d-flex justify-content-between mt-4">
-                            <button type="button" id="prev-btn" class="btn btn-outline-secondary">Previous</button>
-                            <button type="button" id="next-btn" class="btn btn-primary">Next</button>
-                        </div>
-                    </div>
+            <div class="text-center mb-5">
+                <div class="tool-switcher nav" id="generatorModeTabs" role="tablist">
+                    <a class="nav-link active" id="github-mode-tab" data-mode="github" href="#" role="tab">GitHub Generator</a>
+                    <a class="nav-link" id="manual-mode-tab" data-mode="manual" href="#" role="tab">Manual Generator</a>
                 </div>
+            </div>
 
-                <!-- Preview Column -->
-                <div class="col-lg-6">
-                    <div class="preview-container-wrapper position-sticky">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h4 class="mb-0">Live Preview</h4>
-                            <div>
-                                <button id="copy-btn" class="btn btn-sm btn-outline-primary" title="Copy to Clipboard"><i class="bi bi-clipboard"></i> Copy</button>
-                                <button id="download-btn" class="btn btn-sm btn-outline-primary" title="Download .md file"><i class="bi bi-download"></i> Download</button>
+            <div class="row justify-content-center">
+                <!-- Form Column -->
+                <div class="col-lg-8">
+                    <div id="generator-content">
+                        <div class="form-container">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h2 id="generator-title" class="mb-0">README Generator</h2>
+                                <button type="button" id="clear-form-btn" class="btn btn-sm btn-outline-danger" title="Clear all fields and saved progress"><i class="bi bi-trash"></i> Clear Form</button>
+                            </div>
+                            
+                            <!-- GitHub Analysis Section -->
+                            <div id="github-analysis-container" class="mb-4">
+                                <label for="github-url" class="form-label">Start with a GitHub Repository (Optional)</label>
+                                <div class="input-group">
+                                    <input type="url" id="github-url" class="form-control" placeholder="https://github.com/owner/repo">
+                                    <button id="analyze-btn" class="btn btn-outline-secondary" type="button">Analyze</button>
+                                </div>
+                                <div id="github-status" class="form-text mt-2"></div>
+                            </div>
+    
+                            <!-- Progress Bar -->
+                            <div class="progress custom-progress-height mb-4">
+                                <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" title="Form completion progress"></div>
+                            </div>
+    
+                            <!-- Form Steps Container -->
+                            <form id="readme-form" novalidate>
+                                <!-- Form steps will be dynamically inserted here by main.js -->
+                            </form>
+    
+                            <!-- Navigation Buttons -->
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" id="prev-btn" class="btn btn-outline-secondary">Previous</button>
+                                <button type="button" id="next-btn" class="btn btn-primary">Next</button>
                             </div>
                         </div>
-                        <div id="preview-container" class="preview-container"></div>
+                    </div>
+                    <div id="result-container" class="d-none">
+                        <div class="form-container">
+                             <h3 class="mb-3">Your Generated README</h3>
+                             <p class="text-secondary">You can now copy the Markdown or download it as a file.</p>
+                             <label for="result-markdown" class="form-label visually-hidden">Generated README Markdown</label>
+                             <textarea id="result-markdown" class="form-control" rows="20" readonly title="Generated README Markdown" placeholder="Your generated README will appear here"></textarea>
+                             <div class="mt-4 d-flex justify-content-between">
+                                <div>
+                                    <button id="copy-btn" class="btn btn-primary me-2"><i class="bi bi-clipboard"></i> Copy Markdown</button>
+                                    <button id="download-btn" class="btn btn-secondary"><i class="bi bi-download"></i> Download .md File</button>
+                                </div>
+                                <button id="start-over-btn" class="btn btn-outline-secondary">Start Over</button>
+                             </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Features Section (Placeholder) -->
-    <section id="features" class="py-5">
-        <div class="container text-center">
-            <h2 class="section-title">Features</h2>
-            <p class="lead text-secondary">More details about the features can go here.</p>
+    <!-- Features Section -->
+    <section id="features" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Powerful Features, Simple Interface</h2>
+                <p class="lead text-secondary">Everything you need to create stunning documentation with ease.</p>
+            </div>
+            <div class="row">
+                <!-- Feature 1: Guided Form -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card text-center h-100">
+                        <div class="feature-icon"><i class="bi bi-journal-text"></i></div>
+                        <h3>Guided Multi-Step Form</h3>
+                        <p>An intuitive, step-by-step process that ensures you don't miss any crucial information for a complete README.</p>
+                    </div>
+                </div>
+                <!-- Feature 3: GitHub Analysis -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card text-center h-100">
+                        <div class="feature-icon"><i class="bi bi-github"></i></div>
+                        <h3>GitHub Repo Analysis</h3>
+                        <p>Automatically pre-fill project details like title, description, and languages by simply providing a GitHub URL.</p>
+                    </div>
+                </div>
+                <!-- Feature 4: Tones & Customization -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card text-center h-100">
+                        <div class="feature-icon"><i class="bi bi-palette-fill"></i></div>
+                        <h3>Tones & Customization</h3>
+                        <p>Choose from multiple README tones (Professional, Friendly, etc.) to match your project's unique style.</p>
+                    </div>
+                </div>
+                <!-- Feature 5: Easy Export -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card text-center h-100">
+                        <div class="feature-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+                        <h3>Efficient Workflow</h3>
+                        <p>Instantly export your work and never lose progress with auto-save. Copy to clipboard or download the file with one click.</p>
+                    </div>
+                </div>
+                <!-- Feature 6: Privacy-First -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card text-center h-100">
+                        <div class="feature-icon"><i class="bi bi-shield-lock-fill"></i></div>
+                        <h3>Privacy-First Design</h3>
+                        <p>The entire application runs on the client-side. Your data is never sent to a server, ensuring 100% confidentiality.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

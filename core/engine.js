@@ -36,7 +36,7 @@ async function generateReadme(formData) {
         if (!response.ok) {
             throw new Error(`Failed to load template '${templateFile}': ${response.statusText}`);
         }
-        let template = await response.getText();
+        let template = await response.text();
 
         const allFields = formSteps.flatMap(step => step.fields);
         const processedData = {};

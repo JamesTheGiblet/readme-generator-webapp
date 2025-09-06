@@ -6,6 +6,10 @@
 
 The official repository for the Praximous README Generator. This is a powerful, privacy-first web application for creating professional README files with a user-friendly GUI. It serves as the foundation for the upcoming Praximous Professional Suite.
 
+## 🌐 Live Demo
+
+[**Try the README Generator now!**](https://jamesthegiblet.github.io/readme-generator-webapp/)  <!-- Replace with your actual deployment link -->
+
 ## About The Project
 
 ![Project Screenshot](https://user-images.githubusercontent.com/12345/123456789-abcdef.png)
@@ -18,8 +22,7 @@ Built on the principles of **privacy** and **empowerment**, this application run
 ## ✨ Core Features
 
 * **📝 Guided Multi-Step Form:** An intuitive, step-by-step process that walks you through every necessary section of a high-quality README.
-* **👁️ Live Interactive Preview:** See the fully rendered Markdown output update in real-time as you fill out the forms.
-* **🔗 GitHub Repo Analysis:** Optionally provide a GitHub URL to automatically analyze your repository and pre-fill project details.
+* **GitHub Repo Analysis:** Optionally provide a GitHub URL to automatically analyze your repository and pre-fill project details.
 * **🎨 Tones & Customization:** Choose from multiple README tones (Professional, Friendly, etc.) to match your project's style.
 * **📥 Easy Export:** Instantly copy the generated Markdown to your clipboard or download it as a `README.md` file.
 
@@ -44,20 +47,31 @@ To run this project locally for development or offline use:
 
 2. **Navigate to the project directory:**
 
-    ```bash
+    ```sh
     cd readme-generator-webapp
     ```
 
-3. **Open `index.html` in your browser:**
+3. **Start a local web server:**
 
-    You can simply double-click the `index.html` file or open it from your browser's "Open File" dialog. No web server is required.
+    This application uses the `fetch` API to load templates, which requires it to be run from a web server. You cannot open `index.html` directly as a file.
+
+    If you have Python installed, you can run a simple server:
+
+    ```sh
+    # For Python 3
+    python -m http.server
+    ```
+
+4. **Open the app in your browser:**
+
+    Navigate to `http://localhost:8000` in your web browser.
 
 ## 🗺️ Roadmap
 
 This project is actively being developed. Here's a look at what's planned:
 
-* [x] Core README generation functionality with live preview
-* [ ] Additional README templates and tone options
+* [x] Core README generation functionality
+* [x] Additional README templates and tone options
 * [ ] Integration with the upcoming Praximous Professional Suite
 * [ ] Add localization for multiple languages
 
@@ -89,7 +103,7 @@ Project Link: [https://github.com/JamesTheGiblet/readme-generator-webapp](https:
 * [Markdown Guide](https://www.markdownguide.org/) for Markdown syntax reference
 * [Bootstrap Icons](https://icons.getbootstrap.com/) for the icons
 * [Bootstrap](https://getbootstrap.com/) for the CSS framework
-* [Font Awesome](https://fontawesome.com/) for the icons
+* [marked.js](https://marked.js.org/) for Markdown parsing
 * [GitHub](https://github.com/) for the inspiration and platform
 
 ---
