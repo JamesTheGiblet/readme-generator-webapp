@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const githubStatus = document.getElementById('github-status');
     const mainNav = document.getElementById('mainNav');
     const copyToastEl = document.getElementById('copy-toast');
-    const copyToast = new bootstrap.Toast(copyToastEl);
+    const copyToast = copyToastEl ? new bootstrap.Toast(copyToastEl) : null;
     const examplesModal = document.getElementById('examplesModal');
 
     // --- State Management ---
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * Handles navigation to the next step.
      */
-    async function nextStep() {
+    function nextStep() {
         if (!validateCurrentStep()) {
             return; // Stop if the current step is invalid
         }
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // Handle form completion
             const formData = getFormData();
-            generatedMarkdown = await generateReadme(formData);
+            generatedMarkdown = generateReadme(formData);
             
             resultMarkdown.value = generatedMarkdown;
 
@@ -353,15 +353,16 @@ function detectProjectTypeFromDescription(description) {
     /**
      * Fetches the suggestion data from the JSON file.
      */
-    async function loadSuggestions() {
+    function loadSuggestions() {
         try {
-            const response = await fetch('templates/suggestions.json');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // Data is now loaded from core/data.js and attached to the window object.
+            if (window.APP_DATA && window.APP_DATA.suggestions) {
+                suggestionsData = window.APP_DATA.suggestions;
+            } else {
+                throw new Error('Suggestion data not found. Ensure core/data.js is loaded correctly.');
             }
-            suggestionsData = await response.json();
         } catch (error) {
-            console.error("Could not load templates/suggestions.json:", error);
+            console.error("Could not load suggestion data:", error);
             // Disable suggester buttons if the file fails to load
             document.querySelectorAll('.suggester-btn').forEach(btn => {
                 btn.disabled = true;
@@ -414,7 +415,7 @@ function detectProjectTypeFromDescription(description) {
      */
     function copyMarkdown() {
         navigator.clipboard.writeText(generatedMarkdown).then(() => {
-            copyToast.show();
+            if (copyToast) copyToast.show();
         }).catch(err => {
             console.error('Failed to copy text: ', err);
             alert('Failed to copy markdown.');
@@ -512,63 +513,74 @@ function detectProjectTypeFromDescription(description) {
     }
 
     // --- Event Listeners ---
-    nextBtn.addEventListener('click', nextStep);
-    prevBtn.addEventListener('click', prevStep);
-    copyBtn.addEventListener('click', copyMarkdown);
-    downloadBtn.addEventListener('click', downloadMarkdown);
-    startOverBtn.addEventListener('click', () => {
-        resultContainer.classList.add('d-none');
-        generatorContent.classList.remove('d-none');
-        currentStep = 0;
-        updateFormStep();
-    });
-    themeToggle.addEventListener('click', toggleTheme);
-    clearFormBtn.addEventListener('click', clearFormProgress);
-    analyzeBtn.addEventListener('click', analyzeRepo);
+    if (nextBtn) nextBtn.addEventListener('click', nextStep);
+    if (prevBtn) prevBtn.addEventListener('click', prevStep);
+    if (copyBtn) copyBtn.addEventListener('click', copyMarkdown);
+    if (downloadBtn) downloadBtn.addEventListener('click', downloadMarkdown);
+    if (startOverBtn) {
+        startOverBtn.addEventListener('click', () => {
+            if (resultContainer && generatorContent) {
+                resultContainer.classList.add('d-none');
+                generatorContent.classList.remove('d-none');
+                currentStep = 0;
+                updateFormStep();
+            }
+        });
+    }
+    if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+    if (clearFormBtn) clearFormBtn.addEventListener('click', clearFormProgress);
+    if (analyzeBtn) analyzeBtn.addEventListener('click', analyzeRepo);
     window.addEventListener('scroll', handleScroll);
 
-    generatorModeTabs.addEventListener('click', (event) => {
-        event.preventDefault();
-        const clickedTab = event.target.closest('.nav-link');
-        if (!clickedTab) return;
-
-        const mode = clickedTab.dataset.mode;
-
-        generatorModeTabs.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
-        clickedTab.classList.add('active');
-
-        if (mode === 'github') {
-            githubAnalysisContainer.style.display = 'block';
-            generatorTitle.textContent = 'GitHub README Generator';
-        } else {
-            githubAnalysisContainer.style.display = 'none';
-            generatorTitle.textContent = 'README Generator';
-        }
-    });
-
-    // Listen for input events to update preview and clear validation.
-    formContainer.addEventListener('input', async (event) => {
-        if (event.target.classList.contains('is-invalid')) {
-            event.target.classList.remove('is-invalid');
-        }
-
-        // If the project type is changed, trigger the suggestion logic.
-        if (event.target.id === 'projectType') {
-            // Do not await here, let it run in the background
-            handleProjectTypeChange(event.target.value);
-        }
-
-        saveFormProgress(); // Save progress on every input
-    });
-
-    // --- App Initialization ---
-    async function initializeApp() {
-        buildForm(); // Build form first to have buttons to disable on error
-        loadFormProgress(); // Load any saved progress from localStorage
-        await loadSuggestions();
-        updateFormStep();
-        applySavedTheme();
+    if (generatorModeTabs) {
+        generatorModeTabs.addEventListener('click', (event) => {
+            event.preventDefault();
+            const clickedTab = event.target.closest('.nav-link');
+            if (!clickedTab) return;
+    
+            const mode = clickedTab.dataset.mode;
+    
+            generatorModeTabs.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
+            clickedTab.classList.add('active');
+    
+            if (mode === 'github' && githubAnalysisContainer && generatorTitle) {
+                githubAnalysisContainer.style.display = 'block';
+                generatorTitle.textContent = 'GitHub README Generator';
+            } else if (githubAnalysisContainer && generatorTitle) {
+                githubAnalysisContainer.style.display = 'none';
+                generatorTitle.textContent = 'README Generator';
+            }
+        });
     }
 
-    initializeApp();
+    // Listen for input events to update preview and clear validation.
+    if (formContainer) {
+        formContainer.addEventListener('input', (event) => {
+            if (event.target.classList.contains('is-invalid')) {
+                event.target.classList.remove('is-invalid');
+            }
+    
+            // If the project type is changed, trigger the suggestion logic.
+            if (event.target.id === 'projectType') {
+                handleProjectTypeChange(event.target.value);
+            }
+    
+            saveFormProgress(); // Save progress on every input
+        });
+    }
+
+    // --- App Initialization ---
+    function initializeApp() {
+        buildForm();
+        loadFormProgress();
+        loadSuggestions();
+        updateFormStep();
+    }
+
+    // Run full initialization only if the main form container exists.
+    if (formContainer) {
+        initializeApp();
+    }
+    // Always apply theme regardless of page.
+    applySavedTheme();
 });

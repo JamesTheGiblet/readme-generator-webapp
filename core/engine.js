@@ -21,22 +21,15 @@ function getFormData() {
  * @param {Object} formData - The data collected from the form.
  * @returns {Promise<string>} A promise that resolves with the generated Markdown content.
  */
-async function generateReadme(formData) {
+function generateReadme(formData) {
     try {
-        const tone = formData.readmeTone || 'Professional';
-        let templateFile = 'default.md';
-
-        if (tone === 'Friendly') {
-            templateFile = 'friendly.md';
-        } else if (tone === 'Concise') {
-            templateFile = 'concise.md';
+        const tone = formData.readmeTone || 'Professional'; // Default to Professional
+        const readmeTemplates = window.APP_DATA.templates;
+        let template = readmeTemplates[tone];
+        if (!template) {
+            console.warn(`Template for tone '${tone}' not found. Falling back to Professional.`);
+            template = readmeTemplates['Professional'];
         }
-
-        const response = await fetch(`templates/${templateFile}`);
-        if (!response.ok) {
-            throw new Error(`Failed to load template '${templateFile}': ${response.statusText}`);
-        }
-        let template = await response.text();
 
         const allFields = formSteps.flatMap(step => step.fields);
         const processedData = {};
@@ -54,15 +47,23 @@ async function generateReadme(formData) {
 
         // Handle conditional blocks: {{#if key}}...{{/if}}
         template = template.replace(/\{\{#if (\w+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (match, key, content) => {
-            return processedData[key] && processedData[key].trim() !== '' ? content.trim() : '';
+            return processedData[key] && String(processedData[key]).trim() !== '' ? content.trim() : '';
         });
 
-        // Handle simple replacements: {{key}}
-        template = template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-            return processedData[key] || '';
-        });
+        // Replace placeholders iteratively to avoid issues with complex multi-line strings.
+        for (const key in processedData) {
+            if (Object.hasOwnProperty.call(processedData, key)) {
+                // Using a function for the replacement value prevents special
+                // interpretation of characters like '$' in the replacement string.
+                const replacementValue = processedData[key] || '';
+                template = template.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), () => replacementValue);
+            }
+        }
 
-        return template.trim() ? template.trim() : '# Your README will appear here...';
+        // Clean up any remaining placeholders that didn't have data
+        const finalTemplate = template.replace(/\{\{(\w+)\}\}/g, '');
+
+        return finalTemplate.trim() ? finalTemplate.trim() : '# Your README will appear here...';
     } catch (error) {
         console.error("Error generating README:", error);
         return "Error: Could not generate README. Failed to load template.";

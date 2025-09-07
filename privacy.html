@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Praximous</title>
+    <meta name="description" content="Privacy Policy for the Praximous README Generator.">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style/styles.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav id="mainNav" class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Praximous</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#generator">Generator</a></li>
+                    <li class="nav-item">
+                        <button id="theme-toggle" class="theme-toggle" title="Toggle theme">
+                            <i class="bi bi-sun-fill"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Section -->
+    <main class="py-5 mt-5">
+        <div class="container">
+            <h1 class="display-5 fw-bold mb-4">Privacy Policy</h1>
+            
+            <p>Last updated: October 27, 2023</p>
+
+            <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
+
+            <h2 class="h4 mt-4">Our Privacy-First Commitment</h2>
+            <p>This application is designed with your privacy as a top priority. All data processing, including README generation and GitHub repository analysis, happens entirely within your browser (client-side). <strong>No data you enter or generate is ever sent to, or stored on, our servers.</strong> Your work is yours alone.</p>
+            
+            <h2 class="h4 mt-4">Local Storage</h2>
+            <p>To improve your experience, this application uses your browser's `localStorage` to save your form progress automatically. This data is stored only on your computer and is not accessible by us or any third party. You can clear this data at any time by using the "Clear Form" button or by clearing your browser's cache.</p>
+
+            <h2 class="h4 mt-4">GitHub API</h2>
+            <p>When you use the "Analyze Repository" feature, your browser makes direct requests to the public GitHub API. This interaction is between your browser and GitHub. We do not proxy, view, or log these requests.</p>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-5 text-center">
+        <div class="container">
+            <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+                <li class="nav-item"><a href="terms.html" class="nav-link px-2 text-white-50">Terms & Conditions</a></li>
+                <li class="nav-item"><a href="privacy.html" class="nav-link px-2 text-white-50">Privacy Policy</a></li>
+                <li class="nav-item"><a href="contact.html" class="nav-link px-2 text-white-50">Contact</a></li>
+                <li class="nav-item"><a href="https://jamesthegiblet.github.io/Project-Flux-MVP-Ready/" class="nav-link px-2 text-white-50" target="_blank" rel="noopener noreferrer">Project Flux</a></li>
+            </ul>
+            <p class="m-0 text-white-50">Copyright &copy; Praximous 2023</p>
+            <p class="m-0 text-white-50">
+                Built by <a href="https://github.com/JamesTheGiblet" class="text-white">James "The Giblet" Mavric</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="core/form-data.js"></script>
+    <script src="core/data.js"></script>
+    <script src="core/engine.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

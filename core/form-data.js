@@ -16,13 +16,17 @@ const formSteps = [
                 type: "textarea",
                 placeholder: "A short and catchy description of your project.",
                 required: true,
-                helpText: "A one-paragraph description of your project's purpose and value."
+                helpText: "A one-paragraph description of your project's purpose and value.",
+                formatter: (value) => {
+                    if (!value) return '';
+                    return value.replace(/\r\n/g, '\n');
+                }
             },
             {
                 id: "projectType",
                 label: "Project Type / Platform (Optional)",
                 type: "select",
-                options: ["", "Web Application", "Mobile Application", "Desktop Application", "CLI Tool", "Library / Framework", "Data Science Project", "Game", "Other"],
+                options: ["", "Web Application", "API / Backend", "Mobile Application", "Desktop Application", "CLI Tool", "Library / Framework", "Data Science Project", "Game", "Browser Extension", "Discord Bot", "Other"],
                 required: false,
                 helpText: "What kind of project is this?"
             },
@@ -100,13 +104,22 @@ const formSteps = [
                 type: "textarea",
                 placeholder: "1. Clone the repo\n   ```sh\n   git clone https://github.com/your_username/your_project.git\n   ```\n2. Install NPM packages\n   ```sh\n   npm install\n   ```",
                 helpText: "Provide step-by-step instructions. This will be auto-filled with a template when you select a Project Type.",
+                formatter: (value) => {
+                    if (!value) return '';
+                    // This ensures multi-line strings with special markdown characters are handled correctly by normalizing line endings.
+                    return value.replace(/\r\n/g, '\n');
+                }
             },
             {
                 id: "usage",
                 label: "Usage Guide",
                 type: "textarea",
                 placeholder: "Provide examples of how to use your project.",
-                helpText: "Explain how to use your project after installation."
+                helpText: "Explain how to use your project after installation.",
+                formatter: (value) => {
+                    if (!value) return '';
+                    return value.replace(/\r\n/g, '\n');
+                }
             }
         ]
     },
@@ -118,7 +131,11 @@ const formSteps = [
                 label: "Contributing Guidelines",
                 type: "textarea",
                 placeholder: "Contributions are what make the open source community such an amazing place... We welcome contributions!",
-                helpText: "Explain how others can contribute to your project."
+                helpText: "Explain how others can contribute to your project.",
+                formatter: (value) => {
+                    if (!value) return '';
+                    return value.replace(/\r\n/g, '\n');
+                }
             },
             {
                 id: "githubUsername",
@@ -133,7 +150,18 @@ const formSteps = [
                 label: "License",
                 type: "select",
                 options: ["MIT", "GPLv3", "Apache 2.0", "Unlicensed"],
-                helpText: "Choose a license for your project."
+                helpText: "Choose a license for your project.",
+                formatter: (value) => {
+                    if (!value || value === 'Unlicensed') return '';
+                    const licenseData = {
+                        'MIT': { badge: 'MIT-yellow', link: 'MIT' },
+                        'GPLv3': { badge: 'GPLv3-blue', link: 'GPL-3.0' },
+                        'Apache 2.0': { badge: 'Apache_2.0-blue', link: 'Apache-2.0' }
+                    };
+                    const data = licenseData[value];
+                    if (!data) return '';
+                    return `[!License: ${value}](https://opensource.org/licenses/${data.link})`;
+                }
             },
             {
                 id: "readmeTone",
@@ -149,74 +177,112 @@ const formSteps = [
 
 // Helper function to get badge colors for different technologies
 function getTechBadgeColor(tech) {
-    const colors = {
+    const colors = { // Maintained in parallel with logos map
         'javascript': '%23F7DF1E',
         'typescript': '%233178C6',
         'react': '%2361DAFB',
+        'nextjs': '%23000000',
         'vue.js': '%234FC08D',
         'angular': '%23DD0031',
         'node.js': '%23339933',
         'python': '%233776AB',
         'java': '%23ED8B00',
         'c#': '%23239120',
+        'c++': '%2300599C',
         'go': '%2300ADD8',
         'rust': '%23000000',
+        'kotlin': '%237F52FF',
+        'swift': '%23F05138',
+        'flutter': '%2302569B',
         'html': '%23E34F26',
         'css': '%231572B6',
         'sass': '%23CC6699',
         'bootstrap': '%237952B3',
-        'tailwind': '%2338B2AC',
+        'tailwindcss': '%2338B2AC',
+        'vite': '%23646CFF',
         'express': '%23000000',
         'django': '%23092E20',
         'flask': '%23000000',
+        'gin': '%23008ECF',
+        'pytorch': '%23EE4C2C',
+        'tensorflow': '%23FF6F00',
+        'jupyter': '%23F37626',
         'mongodb': '%2347A248',
         'postgresql': '%23336791',
         'mysql': '%234479A1',
         'redis': '%23DC382D',
         'docker': '%232496ED',
         'kubernetes': '%23326CE5',
+        'tauri': '%2324C8DB',
+        '.netmaui': '%23512BD4',
+        'qt': '%2341CD52',
+        'godot': '%23478CBF',
+        'discord.js': '%235865F2',
+        'discord.py': '%235865F2',
+        'pm2': '%232B037A',
         'aws': '%23232F3E',
         'azure': '%230078D4',
-        'gcp': '%234285F4'
+        'gcp': '%234285F4',
+        'doxygen': '%23273472',
+        'mlflow': '%230194E2'
     };
     
-    const techLower = tech.toLowerCase().replace(/\s+/g, '').replace('.', '');
+    const techLower = tech.toLowerCase().replace(/\s+/g, '').replace(/[.+]/g, '');
     return colors[techLower] || '%23333333';
 }
 
 // Helper function to get logo names for shields.io badges
 function getTechLogoName(tech) {
-    const logos = {
+    const logos = { // Maintained in parallel with colors map
         'javascript': 'javascript',
         'typescript': 'typescript',
         'react': 'react',
+        'nextjs': 'nextdotjs',
         'vue.js': 'vuedotjs',
         'angular': 'angular',
         'node.js': 'nodedotjs',
         'python': 'python',
         'java': 'java',
         'c#': 'csharp',
+        'c++': 'cplusplus',
         'go': 'go',
         'rust': 'rust',
+        'kotlin': 'kotlin',
+        'swift': 'swift',
+        'flutter': 'flutter',
         'html': 'html5',
         'css': 'css3',
         'sass': 'sass',
         'bootstrap': 'bootstrap',
-        'tailwind': 'tailwindcss',
+        'tailwindcss': 'tailwindcss',
+        'vite': 'vite',
         'express': 'express',
         'django': 'django',
         'flask': 'flask',
+        'gin': 'gin',
+        'pytorch': 'pytorch',
+        'tensorflow': 'tensorflow',
+        'jupyter': 'jupyter',
         'mongodb': 'mongodb',
         'postgresql': 'postgresql',
         'mysql': 'mysql',
         'redis': 'redis',
         'docker': 'docker',
         'kubernetes': 'kubernetes',
+        'tauri': 'tauri',
+        '.netmaui': 'dotnet',
+        'qt': 'qt',
+        'godot': 'godotengine',
+        'discord.js': 'discorddotjs',
+        'discord.py': 'discord',
+        'pm2': 'pm2',
         'aws': 'amazon-aws',
         'azure': 'microsoft-azure',
-        'gcp': 'google-cloud'
+        'gcp': 'google-cloud',
+        'doxygen': 'doxygen',
+        'mlflow': 'mlflow'
     };
     
-    const techLower = tech.toLowerCase().replace(/\s+/g, '').replace('.', '');
+    const techLower = tech.toLowerCase().replace(/\s+/g, '').replace(/[.+]/g, '');
     return logos[techLower] || tech.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 }
