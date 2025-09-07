@@ -33,7 +33,7 @@ function generateReadme(formData) {
 
         // Handle conditional blocks: {{#if key}}...{{/if}}
         template = template.replace(/\{\{#if (\w+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (match, key, content) => {
-            return processedData[key] && String(processedData[key]).trim() !== '' ? content.trim() : '';
+            return processedData[key] && String(processedData[key]).trim() !== '' ? content : '';
         });
 
         // Replace placeholders iteratively to avoid issues with complex multi-line strings.
