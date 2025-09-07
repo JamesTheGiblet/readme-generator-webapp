@@ -340,6 +340,7 @@ body {
 .progress-bar {
     border-radius: 10px;
     background-color: var(--primary);
+    transition: width 0.4s ease-in-out;
 }
 
 .custom-progress-height {
@@ -366,6 +367,19 @@ body {
 .spinner-border-sm {
     width: 1rem;
     height: 1rem;
+}
+
+/* GitHub Analysis Container Transition */
+#github-analysis-container {
+    transition: opacity 0.4s ease, max-height 0.4s ease, margin-bottom 0.4s ease;
+    overflow: hidden;
+    max-height: 200px; /* Generous height for the content */
+}
+
+#github-analysis-container.hidden-fade {
+    opacity: 0;
+    max-height: 0;
+    margin-bottom: 0 !important; /* Override Bootstrap's mb-4 for a smooth collapse */
 }
 
 /* Analytics cards */

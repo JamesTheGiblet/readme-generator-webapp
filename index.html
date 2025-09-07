@@ -209,10 +209,10 @@
                 <div class="modal-body">
                     <ul class="nav nav-tabs" id="exampleTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="professional-example-tab" data-bs-toggle="tab" data-bs-target="#professional-example" type="button" role="tab" aria-controls="professional-example" aria-selected="true" data-example-path="examples/Professional-readme.md">Professional</button>
+                            <button class="nav-link active" id="professional-example-tab" data-bs-toggle="tab" data-bs-target="#professional-example" type="button" role="tab" aria-controls="professional-example" aria-selected="true" data-example-path="examples/professional-readme.md">Professional</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="friendly-example-tab" data-bs-toggle="tab" data-bs-target="#friendly-example" type="button" role="tab" aria-controls="friendly-example" aria-selected="false" data-example-path="examples/Friendly-readme.md">Friendly</button>
+                            <button class="nav-link" id="friendly-example-tab" data-bs-toggle="tab" data-bs-target="#friendly-example" type="button" role="tab" aria-controls="friendly-example" aria-selected="false" data-example-path="examples/friendly-readme.md">Friendly</button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="concise-example-tab" data-bs-toggle="tab" data-bs-target="#concise-example" type="button" role="tab" aria-controls="concise-example" aria-selected="false" data-example-path="examples/concise-readme.md">Concise</button>
@@ -220,13 +220,25 @@
                     </ul>
                     <div class="tab-content pt-3" id="exampleTabsContent">
                         <div class="tab-pane fade show active" id="professional-example" role="tabpanel" aria-labelledby="professional-example-tab">
-                            <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+                            <div class="d-flex justify-content-center align-items-center spinner-container">
+                                <div class="spinner-border text-primary spinner-large" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="tab-pane fade" id="friendly-example" role="tabpanel" aria-labelledby="friendly-example-tab">
-                            <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+                            <div class="d-flex justify-content-center align-items-center spinner-container">
+                                <div class="spinner-border text-primary spinner-large" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="tab-pane fade" id="concise-example" role="tabpanel" aria-labelledby="concise-example-tab">
-                            <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+                            <div class="d-flex justify-content-center align-items-center spinner-min-height">
+                                <div class="spinner-border text-primary spinner-large" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

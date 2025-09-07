@@ -571,25 +571,30 @@ function detectProjectTypeFromDescription(description) {
     if (examplesModal) {
         const exampleTabs = examplesModal.querySelectorAll('.nav-link[data-bs-toggle="tab"]');
 
-        const loadExampleContent = async (tab) => {
+        const loadExampleContent = (tab) => {
             const targetPaneId = tab.getAttribute('data-bs-target');
             const targetPane = document.querySelector(targetPaneId);
             
             // Only load if it hasn't been loaded yet (check for spinner)
             if (targetPane && targetPane.querySelector('.spinner-border')) {
-                const path = tab.dataset.examplePath;
-                try {
-                    const response = await fetch(path);
-                    if (!response.ok) {
-                        throw new Error(`Failed to load ${path}`);
+                // Use a small timeout to ensure the spinner is rendered before we replace it.
+                // This improves the perceived performance and user experience.
+                setTimeout(() => {
+                    const path = tab.dataset.examplePath;
+                    const exampleKey = path.split('/').pop().replace('-readme.md', '');
+    
+                    try {
+                        if (window.APP_DATA && window.APP_DATA.examples && window.APP_DATA.examples[exampleKey]) {
+                            const markdown = window.APP_DATA.examples[exampleKey];
+                            targetPane.innerHTML = `<div class="readme-preview-content">${marked.parse(markdown)}</div>`;
+                        } else {
+                            throw new Error(`Example content for '${exampleKey}' not found in APP_DATA.`);
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        targetPane.innerHTML = `<div class="alert alert-danger">Could not load example. ${error.message}</div>`;
                     }
-                    const markdown = await response.text();
-                    // Use a custom class for the preview content inside the modal
-                    targetPane.innerHTML = `<div class="readme-preview-content">${marked.parse(markdown)}</div>`;
-                } catch (error) {
-                    console.error(error);
-                    targetPane.innerHTML = `<div class="alert alert-danger">Could not load example. Please ensure the file exists at '${path}'.</div>`;
-                }
+                }, 200); // A small delay like 200ms is enough for the UI to update.
             }
         };
 
@@ -641,11 +646,11 @@ function detectProjectTypeFromDescription(description) {
             clickedTab.classList.add('active');
     
             if (mode === 'github' && githubAnalysisContainer && generatorTitle) {
-                githubAnalysisContainer.style.display = 'block';
+                githubAnalysisContainer.classList.remove('hidden-fade');
                 generatorTitle.textContent = 'GitHub README Generator';
             } else if (githubAnalysisContainer && generatorTitle) {
-                githubAnalysisContainer.style.display = 'none';
-                generatorTitle.textContent = 'README Generator';
+                githubAnalysisContainer.classList.add('hidden-fade');
+                generatorTitle.textContent = 'Manual Generator';
             }
         });
     }
