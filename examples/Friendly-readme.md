@@ -1,75 +1,32 @@
-# 👋 Praximous README Generator
+﻿# 👋 Welcome to Pixel-Pet
 
-A powerful, privacy-first web application for creating professional README files with a user-friendly GUI. It serves as the foundation for the upcoming Praximous Professional Suite.
+[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-> **Project Type:** A Web Application.
+Hey there! Thanks for checking out **Pixel-Pet**, a fun little browser game where you can raise your own virtual pet.
 
-## 🚀 Live Demo
+## ✨ Check it out live
 
-Why read when you can see it in action? Check out the live demo here: [https://jamesthegiblet.github.io/readme-generator-webapp/](https://jamesthegiblet.github.io/readme-generator-webapp/)
+Want to see it in action? Head over to the live demo: [https://example.com/pixel-pet](https://example.com/pixel-pet)
 
-## 🛠️ What's Under the Hood? (Tech Stack)
+### 🚀 What can it do?
 
-![HTML](https://img.shields.io/badge/HTML-%23E34F26?style=for-the-badge&logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/CSS-%231572B6?style=for-the-badge&logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-%23F7DF1E?style=for-the-badge&logo=javascript&logoColor=white) ![React](https://img.shields.io/badge/React-%2361DAFB?style=for-the-badge&logo=react&logoColor=white) ![Node.js](https://img.shields.io/badge/Node.js-%23339933?style=for-the-badge&logo=nodedotjs&logoColor=white) ![Express](https://img.shields.io/badge/Express-%23000000?style=for-the-badge&logo=express&logoColor=white)
+- Feed, play with, and care for your pet.
+- Watch your pet grow and evolve.
+- Earn coins to buy accessories.
+- Fully responsive and works on mobile!
 
-## 🧰 Tools of the Trade
+### 🛠️ Built With
 
-* VS Code
-* Webpack
-* Babel
-* npm
-* Git
-* Docker
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=white) ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 
-## ✨ Features
+### ⚙️ Getting it running
 
-* Guided Multi-Step Form
-* GitHub Repo Analysis
-* Tones & Customization
-* Easy Export
-* Privacy-First Design
-* Auto-Save Progress
+Just open the `index.html` file in your favorite browser! No installation needed.
 
-## 🚀 Getting Started
+### 🤝 Want to contribute?
 
-### Installation
+We love contributions! If you have an idea for a new feature or found a bug, feel free to open an issue or a pull request.
 
-1. Clone the repository:
+### 📬 Get in touch
 
-   ```bash
-   git clone https://github.com/JamesTheGiblet/readme-generator-webapp.git
-   ```
-
-2. Navigate to the project directory:
-
-   ```bash
-   cd readme-generator-webapp
-   ```
-
-3. Start a local web server:
-
-   This application uses `fetch` to load templates and must be run from a server. You cannot open `index.html` directly as a file.
-
-   ```bash
-   # For Python 3
-   python -m http.server
-   ```
-
-4. Open your browser and visit `http://localhost:8000`.
-
-### Usage
-
-This tool offers two primary workflows:
-
-1. **GitHub Generator:** Provide a public GitHub repository URL to automatically analyze and pre-fill project details.
-2. **Manual Generator:** Follow the guided, multi-step form to build your README from scratch.
-
-## 🤝 Want to Contribute?
-
-We love contributions from the community!
-
-Contributions are welcome and greatly appreciated! Please fork the repository and create a pull request with your changes. For major changes, please open an issue first to discuss what you would like to change.
-
-## 📄 License
-
-This project is licensed under the MIT License. Feel free to use it!
+This project was created by me, @your-username. I'd love to hear from you!

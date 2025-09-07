@@ -1,69 +1,33 @@
-# Praximous README Generator
+# Code-Snippets Library
 
-A powerful, privacy-first web application for creating professional README files with a user-friendly GUI. It serves as the foundation for the upcoming Praximous Professional Suite.
+> A lightweight, zero-dependency library for managing and sharing code snippets.
 
-## Demo
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-[https://jamesthegiblet.github.io/readme-generator-webapp/](https://jamesthegiblet.github.io/readme-generator-webapp/)
-
-## Tech Stack
-
-![HTML](https://img.shields.io/badge/HTML-%23E34F26?style=for-the-badge&logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/CSS-%231572B6?style=for-the-badge&logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-%23F7DF1E?style=for-the-badge&logo=javascript&logoColor=white) ![React](https://img.shields.io/badge/React-%2361DAFB?style=for-the-badge&logo=react&logoColor=white) ![Node.js](https://img.shields.io/badge/Node.js-%23339933?style=for-the-badge&logo=nodedotjs&logoColor=white) ![Express](https://img.shields.io/badge/Express-%23000000?style=for-the-badge&logo=express&logoColor=white)
-
-## Tools
-
-* VS Code
-* Webpack
-* Babel
-* npm
-* Git
-* Docker
+**Live Demo:** [https://example.com/code-snippets](https://example.com/code-snippets)
 
 ## Features
 
-* Guided Multi-Step Form
-* GitHub Repo Analysis
-* Tones & Customization
-* Easy Export
-* Privacy-First Design
-* Auto-Save Progress
+- Zero-dependency and tree-shakable.
+- Syntax highlighting support.
+- Simple and intuitive API.
+- TypeScript support out of the box.
+
+## Tech
+
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 
 ## Installation
 
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/JamesTheGiblet/readme-generator-webapp.git
-   ```
-
-2. Navigate to the project directory:
-
-   ```bash
-   cd readme-generator-webapp
-   ```
-
-3. Start a local web server:
-
-   This application uses `fetch` to load templates and must be run from a server. You cannot open `index.html` directly as a file.
-
-   ```bash
-   # For Python 3
-   python -m http.server
-   ```
-
-4. Open your browser and visit `http://localhost:8000`.
+```sh
+npm install code-snippets-lib
+```
 
 ## Usage
 
-This tool offers two primary workflows:
+```javascript
+import { getSnippet } from 'code-snippets-lib';
 
-1. **GitHub Generator:** Provide a public GitHub repository URL to automatically analyze and pre-fill project details.
-2. **Manual Generator:** Follow the guided, multi-step form to build your README from scratch.
-
-## Contributing
-
-Contributions are welcome and greatly appreciated! Please fork the repository and create a pull request with your changes. For major changes, please open an issue first to discuss what you would like to change.
-
-## License
-
-Licensed under the MIT License.
+const mySnippet = getSnippet('javascript', 'console.log("Hello, World!");');
+document.body.innerHTML = mySnippet.html;
+```

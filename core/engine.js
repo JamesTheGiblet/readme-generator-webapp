@@ -3,20 +3,6 @@
  */
 
 /**
- * Gathers all form data into a single object.
- * @returns {Object} An object where keys are field IDs and values are the user's input.
- */
-function getFormData() {
-    const formData = {};
-    const form = document.getElementById('readme-form');
-    const inputs = form.querySelectorAll('input, textarea, select');
-    inputs.forEach(input => {
-        formData[input.id] = input.value;
-    });
-    return formData;
-}
-
-/**
  * Generates the complete README Markdown string based on the current form data.
  * @param {Object} formData - The data collected from the form.
  * @returns {Promise<string>} A promise that resolves with the generated Markdown content.
@@ -53,10 +39,10 @@ function generateReadme(formData) {
         // Replace placeholders iteratively to avoid issues with complex multi-line strings.
         for (const key in processedData) {
             if (Object.hasOwnProperty.call(processedData, key)) {
-                // Using a function for the replacement value prevents special
-                // interpretation of characters like '$' in the replacement string.
+                const placeholder = `{{${key}}}`;
                 const replacementValue = processedData[key] || '';
-                template = template.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), () => replacementValue);
+                // Using split/join is a robust way to replace all occurrences without regex complexities.
+                template = template.split(placeholder).join(replacementValue);
             }
         }
 

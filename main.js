@@ -31,6 +31,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Functions ---
 
     /**
+     * Gathers all form data into a single object.
+     * @returns {Object} An object where keys are field IDs and values are the user's input.
+     */
+    function getFormData() {
+        const formData = {};
+        const form = document.getElementById('readme-form');
+        const inputs = form.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+            formData[input.id] = input.value;
+        });
+        return formData;
+    }
+
+    /**
      * Saves the current form data to localStorage.
      */
     function saveFormProgress() {
@@ -159,8 +173,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentFields.forEach(field => {
             const inputElement = document.getElementById(field.id);
-            // The .is-invalid class is a Bootstrap class for styling validation errors.
+            let isFieldValid = true;
+
+            // Check for required fields
             if (field.required && !inputElement.value.trim()) {
+                isFieldValid = false;
+            }
+
+            // Check for valid URL format if the type is 'url' and it's not empty
+            if (field.type === 'url' && inputElement.value.trim()) {
+                const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+                if (!urlRegex.test(inputElement.value.trim())) {
+                    isFieldValid = false;
+                }
+            }
+
+            if (!isFieldValid) {
                 inputElement.classList.add('is-invalid');
                 isStepValid = false;
             } else {

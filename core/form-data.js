@@ -18,8 +18,8 @@ const formSteps = [
                 required: true,
                 helpText: "A one-paragraph description of your project's purpose and value.",
                 formatter: (value) => {
-                    if (!value) return '';
-                    return value.replace(/\r\n/g, '\n');
+                    if (!value) return "";
+                    return value.split(/\r?\n/).join('\n');
                 }
             },
             {
@@ -79,8 +79,8 @@ const formSteps = [
                 helpText: "List the key features of your project, one per line.",
                 formatter: (value) => {
                     if (!value) return "";
-                    // Split by lines and ensure each line starts with a bullet point
-                    return value.split('\n')
+                    // Split by any kind of line break and ensure each line starts with a bullet point
+                    return value.split(/\r?\n/)
                         .map(line => line.trim())
                         .filter(line => line.length > 0)
                         .map(line => {
@@ -105,9 +105,9 @@ const formSteps = [
                 placeholder: "1. Clone the repo\n   ```sh\n   git clone https://github.com/your_username/your_project.git\n   ```\n2. Install NPM packages\n   ```sh\n   npm install\n   ```",
                 helpText: "Provide step-by-step instructions. This will be auto-filled with a template when you select a Project Type.",
                 formatter: (value) => {
-                    if (!value) return '';
-                    // This ensures multi-line strings with special markdown characters are handled correctly by normalizing line endings.
-                    return value.replace(/\r\n/g, '\n');
+                    if (!value) return "";
+                    // Normalize all line endings to \n to prevent markdown rendering issues.
+                    return value.split(/\r?\n/).join('\n');
                 }
             },
             {
@@ -117,8 +117,8 @@ const formSteps = [
                 placeholder: "Provide examples of how to use your project.",
                 helpText: "Explain how to use your project after installation.",
                 formatter: (value) => {
-                    if (!value) return '';
-                    return value.replace(/\r\n/g, '\n');
+                    if (!value) return "";
+                    return value.split(/\r?\n/).join('\n');
                 }
             }
         ]
@@ -133,8 +133,8 @@ const formSteps = [
                 placeholder: "Contributions are what make the open source community such an amazing place... We welcome contributions!",
                 helpText: "Explain how others can contribute to your project.",
                 formatter: (value) => {
-                    if (!value) return '';
-                    return value.replace(/\r\n/g, '\n');
+                    if (!value) return "";
+                    return value.split(/\r?\n/).join('\n');
                 }
             },
             {
@@ -160,7 +160,9 @@ const formSteps = [
                     };
                     const data = licenseData[value];
                     if (!data) return '';
-                    return `[!License: ${value}](https://opensource.org/licenses/${data.link})`;
+                    const badgeUrl = `https://img.shields.io/badge/License-${data.badge.replace(/_/g, '%20').replace(/-/g, '--')}.svg`;
+                    const licenseUrl = `https://opensource.org/licenses/${data.link}`;
+                    return `[!License: ${value}](${licenseUrl})`;
                 }
             },
             {
