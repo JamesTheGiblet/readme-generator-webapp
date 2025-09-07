@@ -15,26 +15,44 @@
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav id="mainNav" class="navbar navbar-expand-lg navbar-light fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">Praximous</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#generator">Generator</a></li>
-                    <li class="nav-item">
-                        <button id="theme-toggle" class="theme-toggle" title="Toggle theme">
-                            <i class="bi bi-sun-fill"></i>
-                        </button>
-                    </li>
-                </ul>
+<!-- Updated Navigation Section with Dark Mode Toggle -->
+<nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="../index.html">Digital Sovereignty</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Tools
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
+                        <li><a class="dropdown-item active" href="#">Interactive README</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item disabled" href="#">Decentralized ID Manager (Soon)</a></li>
+                        <li><a class="dropdown-item disabled" href="#">Secure Storage Vault (Soon)</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../index.html#features">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../index.html#cli">CLI</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../index.html#analytics">Analytics</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center">
+                <button id="theme-toggle" class="theme-toggle" title="Toggle theme">
+                    <i class="bi bi-sun-fill"></i>
+                </button>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <!-- Hero Section -->
     <header class="hero text-center">
@@ -170,18 +188,15 @@
     </section>
 
     <!-- Footer -->
-    <footer class="py-5 text-center">
+    <footer class="py-5 bg-dark text-white">
         <div class="container">
-            <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-                <li class="nav-item"><a href="terms.html" class="nav-link px-2 text-white-50">Terms & Conditions</a></li>
-                <li class="nav-item"><a href="privacy.html" class="nav-link px-2 text-white-50">Privacy Policy</a></li>
-                <li class="nav-item"><a href="contact.html" class="nav-link px-2 text-white-50">Contact</a></li>
-                <li class="nav-item"><a href="https://jamesthegiblet.github.io/Project-Flux-MVP-Ready/" class="nav-link px-2 text-white-50" target="_blank" rel="noopener noreferrer">Project Flux</a></li>
+            <p class="mb-1">&copy; 2024 The Digital Sovereignty Project. All Rights Reserved.</p>
+            <ul class="list-inline mb-0">
+                <li class="list-inline-item"><a href="../privacy.html" target="_blank" rel="noopener noreferrer" class="text-white-50">Privacy</a></li>
+                <li class="list-inline-item"><a href="../terms.html" target="_blank" rel="noopener noreferrer" class="text-white-50">Terms</a></li>
+                <li class="list-inline-item"><a href="https://jamesthegiblet.github.io/Project-Flux-MVP-Ready/" target="_blank" rel="noopener noreferrer" class="text-white-50">Project Flux</a></li>
+                <li class="list-inline-item"><a href="../contact.html" target="_blank" rel="noopener noreferrer" class="text-white-50">Contact</a></li>
             </ul>
-            <p class="m-0 text-white-50">Copyright &copy; Praximous 2023</p>
-            <p class="m-0 text-white-50">
-                Built by <a href="https://github.com/JamesTheGiblet" class="text-white">James "The Giblet" Mavric</a>
-            </p>
         </div>
     </footer>
 
