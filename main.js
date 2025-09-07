@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainNav = document.getElementById('mainNav');
     const copyToastEl = document.getElementById('copy-toast');
     const copyToast = copyToastEl ? new bootstrap.Toast(copyToastEl) : null;
+    const backToTopBtn = document.querySelector('.back-to-top-btn');
     const examplesModal = document.getElementById('examplesModal');
 
     // --- State Management ---
@@ -133,7 +134,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         prevBtn.style.display = currentStep === 0 ? 'none' : 'inline-block';
-        nextBtn.textContent = currentStep === steps.length - 1 ? 'Finish' : 'Next';
+        if (currentStep === formSteps.length - 1) {
+            nextBtn.innerHTML = 'Finish <i class="bi bi-check-lg"></i>';
+        } else {
+            nextBtn.innerHTML = 'Next <i class="bi bi-arrow-right"></i>';
+        }
 
         const progress = ((currentStep + 1) / steps.length) * 100;
         progressBar.style.width = `${progress}%`;
@@ -242,6 +247,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const languagesData = languagesRes.ok ? await languagesRes.json() : {};
             const contentsData = contentsRes.ok ? await contentsRes.json() : [];
             const fileNames = contentsData.map(file => file.name);
+            let packageJson = null;
+
+            // If package.json exists, fetch it for more detailed analysis
+            if (fileNames.includes('package.json')) {
+                githubStatus.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"></div> Analyzing package.json...`;
+                const packageJsonRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/package.json`);
+                if (packageJsonRes.ok) {
+                    const packageJsonData = await packageJsonRes.json();
+                    const decodedContent = atob(packageJsonData.content);
+                    packageJson = JSON.parse(decodedContent);
+                }
+            }
 
             // Helper to set value and trigger input event
             const setFieldValue = (id, value) => {
@@ -253,9 +270,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 1. Detect Project Type from file structure
             githubStatus.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"></div> Detecting project type...`;
-            let detectedType = detectProjectType(fileNames);
+            let detectedType = detectProjectType(fileNames, packageJson);
 
-            // 2. Analyze description text if no type was found from files
+            // Analyze description text if no type was found from files
             if (!detectedType && repoData.description) {
                 const detectedFromDesc = detectProjectTypeFromDescription(repoData.description);
                 if (detectedFromDesc) {
@@ -263,25 +280,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // 3. Auto-populate suggestions based on detected type
+            // Auto-populate suggestions based on detected type, but prioritize specific data
             if (detectedType) {
                 setFieldValue('projectType', detectedType);
-                // We call this directly, bypassing the confirmation prompt for a smoother UX.
                 const suggestions = suggestionsData[detectedType];
                 if (suggestions) {
-                    setFieldValue('techStack', suggestions.techStack);
+                    // Apply suggestions for fields that are not easily determined from the API
                     setFieldValue('projectTools', suggestions.tools);
-                    setFieldValue('installation', suggestions.setup);
-                    setFieldValue('features', suggestions.features);
+
+                    // Make installation instructions specific to the repo
+                    let setupInstructions = suggestions.setup;
+                    if (setupInstructions) {
+                        setupInstructions = setupInstructions.replace('`git clone ...`', `\`git clone https://github.com/${owner}/${repo}.git\``);
+                        setupInstructions = setupInstructions.replace('<project-name>', repo);
+                    }
+                    setFieldValue('installation', setupInstructions || '');
+
+                    setFieldValue('features', suggestions.features || '');
+                    setFieldValue('usage', suggestions.usage || '');
                 }
-            } else {
-                // If no type detected, use languages from API as a fallback
+            }
+
+            // Handle Tech Stack: Prioritize API data, then fall back to suggestions
+            const languages = Object.keys(languagesData);
+            if (languages.length > 0) {
                 setFieldValue('techStack', Object.keys(languagesData).join(', '));
+            } else if (detectedType && suggestionsData[detectedType]?.techStack) {
+                // Fallback to suggestion if API gives no languages but a type was detected
+                setFieldValue('techStack', suggestionsData[detectedType].techStack);
             }
 
             // Populate form fields
             setFieldValue('projectTitle', repoData.name.split(/[-_]/).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '));
             setFieldValue('githubUsername', repoData.owner.login || '');
+            if (repoData.homepage && repoData.homepage.trim() !== '') {
+                setFieldValue('liveDemoUrl', repoData.homepage);
+            }
 
             // Handle description: prefer repo description, fall back to README content
             if (repoData.description) {
@@ -307,13 +341,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (licenseOption) licenseInput.value = licenseOption.value;
             }
 
+            // Handle Contributing Guidelines
+            if (fileNames.some(f => f.toLowerCase() === 'contributing.md')) {
+                setFieldValue('contributing', `Contributions are welcome! Please see the CONTRIBUTING.md file for guidelines.`);
+            } else if (window.APP_DATA.defaultContributingText) {
+                // Set a generic default if no file is found
+                setFieldValue('contributing', window.APP_DATA.defaultContributingText);
+            }
+
             // Trigger a single update for all fields
             formContainer.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
 
             githubStatus.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill"></i> Repository analyzed successfully!</span>`;
 
         } catch (error) {
-            githubStatus.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> ${error.message}</span>`;
+            let errorMessage = error.message;
+            if (error.message.includes('404')) {
+                errorMessage = `Failed to fetch repository. The repository may be private or the URL may be incorrect. Please check the URL and ensure the repository is public.`;
+            } else if (error.message.includes('403')) {
+                errorMessage = `Failed to fetch repository. This may be due to exceeding the GitHub API rate limit. Please wait a while before trying again.`;
+            }
+            githubStatus.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> ${errorMessage}</span>`;
         } finally {
             analyzeBtn.disabled = false;
         }
@@ -324,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {string[]} fileNames - An array of file names from the repo root.
      * @returns {string} The detected project type or an empty string.
      */
-    function detectProjectType(fileNames) {
+    function detectProjectType(fileNames, packageJson = null) {
         // More specific checks first
         if (fileNames.includes('pubspec.yaml')) return 'Mobile Application'; // Flutter
         if (fileNames.some(f => f.endsWith('.uproject'))) return 'Game'; // Unreal Engine
@@ -334,9 +382,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (fileNames.includes('go.mod')) return 'CLI Tool'; // Go
 
         // Web and JS-related
-        if (fileNames.includes('package.json')) {
-            // Could be refined by actually reading the package.json, but this is a good start.
+        if (packageJson) {
+            const dependencies = { ...(packageJson.dependencies || {}), ...(packageJson.devDependencies || {}) };
+            if (dependencies.react) return 'React Web Application';
+            if (dependencies.next) return 'Next.js Web Application';
+            if (dependencies.vue) return 'Vue.js Web Application';
+            if (dependencies.angular) return 'Angular Web Application';
+            if (dependencies.express) return 'API / Backend';
             return 'Web Application';
+        }
+
+        if (fileNames.includes('index.html')) {
+            // If there's an index.html but no package.json, it's likely a simple static site.
+            return 'Static Web Application';
         }
         if (fileNames.includes('requirements.txt') || fileNames.includes('Pipfile')) {
             // Could be Django/Flask (Web) or a script (Data Science/CLI). A safe bet.
@@ -413,7 +471,8 @@ function detectProjectTypeFromDescription(description) {
             techStack: suggestions.techStack,
             projectTools: suggestions.tools,
             installation: suggestions.setup,
-            features: suggestions.features
+            features: suggestions.features,
+            usage: suggestions.usage
         };
 
         const targetInputs = {};
@@ -491,10 +550,20 @@ function detectProjectTypeFromDescription(description) {
      * Handles the navbar shrink effect on scroll.
      */
     function handleScroll() {
+        // Navbar shrink
         if (window.scrollY > 50) {
             mainNav.classList.add('navbar-scrolled');
         } else {
             mainNav.classList.remove('navbar-scrolled');
+        }
+
+        // Back to top button visibility
+        if (backToTopBtn) {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
         }
     }
 

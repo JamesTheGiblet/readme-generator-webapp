@@ -32,24 +32,27 @@ function generateReadme(formData) {
         }
 
         // Handle conditional blocks: {{#if key}}...{{/if}}
-        template = template.replace(/\{\{#if (\w+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (match, key, content) => {
-            return processedData[key] && String(processedData[key]).trim() !== '' ? content : '';
+        const conditionalRegex = /\{\{#if ([\w.-]+)\}\}([\s\S]*?)\{\{\/if\}\}/g;
+        template = template.replace(conditionalRegex, (match, key, content) => {
+            if (processedData[key] && String(processedData[key]).trim() !== '') {
+                return content;
+            }
+            return '';
         });
 
-        // Replace placeholders iteratively to avoid issues with complex multi-line strings.
+        // Replace placeholders iteratively
         for (const key in processedData) {
             if (Object.hasOwnProperty.call(processedData, key)) {
                 const placeholder = `{{${key}}}`;
                 const replacementValue = processedData[key] || '';
-                // Using split/join is a robust way to replace all occurrences without regex complexities.
                 template = template.split(placeholder).join(replacementValue);
             }
         }
 
-        // Clean up any remaining placeholders that didn't have data
-        const finalTemplate = template.replace(/\{\{(\w+)\}\}/g, '');
+        // Clean up any remaining placeholders that didn't have data, and trim the final output.
+        const finalTemplate = template.replace(/\{\{(\w+)\}\}/g, '').trim();
 
-        return finalTemplate.trim() ? finalTemplate.trim() : '# Your README will appear here...';
+        return finalTemplate ? finalTemplate : '# Your README will appear here...';
     } catch (error) {
         console.error("Error generating README:", error);
         return "Error: Could not generate README. Failed to load template.";

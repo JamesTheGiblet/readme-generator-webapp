@@ -1,16 +1,48 @@
 window.APP_DATA = {
+    defaultContributingText: "Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.\n\nIf you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag \"enhancement\".\n\n1. Fork the Project\n2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)\n3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)\n4. Push to the Branch (`git push origin feature/AmazingFeature`)\n5. Open a Pull Request",
     suggestions: {
         "Web Application": {
             "techStack": "JavaScript, TypeScript, React, Next.js, Vue.js, Node.js, Express, Python, Django, PostgreSQL, Tailwind CSS",
             "tools": "VS Code, Git, npm/yarn, Vite, Webpack, Docker, Postman, ESLint, Prettier",
             "setup": "1. Clone the repo: `git clone ...`\n2. Navigate to the project directory: `cd <project-name>`\n3. Install dependencies: `npm install` (or `yarn install`)\n4. Set up environment variables in a `.env` file (see `.env.example`).\n5. Start the development server: `npm run dev` (or `yarn dev`)",
-            "features": "User Authentication (JWT, OAuth)\nResponsive Design (Mobile-First)\nRESTful or GraphQL API\nDatabase Integration (e.g., PostgreSQL, MongoDB)\nServer-Side Rendering (SSR) or Static Site Generation (SSG)\nState Management (e.g., Redux, Zustand, Pinia)\nUnit & Integration Testing\nCI/CD Pipeline"
+            "features": "User Authentication (JWT, OAuth)\nResponsive Design (Mobile-First)\nRESTful or GraphQL API\nDatabase Integration (e.g., PostgreSQL, MongoDB)\nServer-Side Rendering (SSR) or Static Site Generation (SSG)\nState Management (e.g., Redux, Zustand, Pinia)\nUnit & Integration Testing\nCI/CD Pipeline for automated deployments (e.g., Vercel, Netlify, AWS)"
+        },
+        "Static Web Application": {
+            "techStack": "HTML, CSS, JavaScript",
+            "tools": "VS Code, Git, Live Server",
+            "setup": "1. Clone the repository: `git clone ...`\n2. Navigate to the project directory: `cd <project-name>`\n3. This project needs to be run from a web server due to browser security policies (CORS). You cannot open `index.html` directly as a file.\n   - **Using VS Code:** Use the Live Server extension.\n   - **Using Python:** Run `python -m http.server` in the project directory and open `http://localhost:8000`.\n   - **Using Node.js:** Install a simple server like `npm install -g serve` and run `serve`.",
+            "features": "Responsive Design\nInteractive UI with JavaScript\nPurely client-side, no build step required\nOptimized for fast loading",
+            "usage": "Once the application is running on your local server, you can start generating your README.\n\n1. **(Optional)** Use the GitHub analysis tool to pre-fill fields from a public repository.\n2. Fill out the form fields step-by-step.\n3. On the final step, click 'Finish' to see your generated README.\n4. Use the 'Copy' or 'Download' buttons to get your file."
+        },
+        "React Web Application": {
+            "techStack": "React, JavaScript, TypeScript, CSS, HTML, Vite",
+            "tools": "VS Code, Git, npm/yarn, Vite, ESLint, Prettier",
+            "setup": "1. Clone the repo: `git clone ...`\n2. Install dependencies: `npm install`\n3. Start the development server: `npm run dev`",
+            "features": "Component-based architecture\nVirtual DOM for high performance\nState management (e.g., Context API, Redux)\nClient-side routing with React Router\nReusable UI components"
+        },
+        "Next.js Web Application": {
+            "techStack": "Next.js, React, TypeScript, Tailwind CSS",
+            "tools": "VS Code, Git, npm/yarn, Vercel, ESLint, Prettier",
+            "setup": "1. Clone the repo: `git clone ...`\n2. Install dependencies: `npm install`\n3. Start the development server: `npm run dev`",
+            "features": "Server-Side Rendering (SSR) and Static Site Generation (SSG)\nFile-based routing\nAPI Routes for backend functionality\nImage Optimization\nFast Refresh for a great developer experience"
+        },
+        "Vue.js Web Application": {
+            "techStack": "Vue.js, JavaScript, TypeScript, Vite, Pinia",
+            "tools": "VS Code, Git, npm/yarn, Vite, Vue DevTools, ESLint",
+            "setup": "1. Clone the repo: `git clone ...`\n2. Install dependencies: `npm install`\n3. Start the development server: `npm run dev`",
+            "features": "Approachable and progressive framework\nComponent-based architecture\nReactive data binding\nState management with Pinia\nSingle File Components (.vue files)"
+        },
+        "Angular Web Application": {
+            "techStack": "Angular, TypeScript, RxJS",
+            "tools": "VS Code, Git, npm/yarn, Angular CLI, ESLint",
+            "setup": "1. Clone the repo: `git clone ...`\n2. Install dependencies: `npm install`\n3. Start the development server: `ng serve`",
+            "features": "Comprehensive and opinionated framework\nTwo-way data binding\nDependency Injection\nModular architecture with NgModules\nPowerful CLI for code generation and builds"
         },
         "API / Backend": {
             "techStack": "Node.js, Express, TypeScript, Python, Django, Flask, Go, Gin, Rust, Axum, PostgreSQL, MongoDB, Redis",
             "tools": "VS Code, Git, Docker, Docker Compose, Postman, Insomnia, ngrok",
             "setup": "1. Clone the repo: `git clone ...`\n2. Install dependencies (e.g., `npm install`, `pip install -r requirements.txt`).\n3. Set up environment variables in a `.env` file.\n4. Run database migrations.\n5. Start the server: `npm run start` or `python app.py`",
-            "features": "Secure RESTful or GraphQL endpoints\nAuthentication & Authorization (JWT, OAuth2)\nDatabase ORM (e.g., Prisma, SQLAlchemy, GORM)\nRate Limiting\nLogging and Monitoring\nComprehensive API Documentation (e.g., Swagger, OpenAPI)\nContainerization with Docker\nRobust Error Handling"
+            "features": "Secure RESTful or GraphQL endpoints\nAuthentication & Authorization (JWT, OAuth2)\nDatabase ORM (e.g., Prisma, SQLAlchemy, GORM)\nRate Limiting\nLogging and Monitoring\nComprehensive API Documentation (e.g., Swagger, OpenAPI, Postman Docs)\nContainerization with Docker\nRobust Error Handling"
         },
         "Mobile Application": {
             "techStack": "Kotlin, Swift, Jetpack Compose, SwiftUI, React Native, Flutter, Firebase",
@@ -59,6 +91,18 @@ window.APP_DATA = {
             "tools": "VS Code, Git, npm, Pip, Docker, PM2",
             "setup": "1. Clone the repository: `git clone ...`\n2. Install dependencies: `npm install` or `pip install -r requirements.txt`\n3. Create a `.env` file and add your `DISCORD_TOKEN` and other variables.\n4. Register slash commands: `node deploy-commands.js`\n5. Start the bot: `npm start` or `python bot.py`",
             "features": "Slash Command Handling\nEvent Listeners (e.g., member join, message sent)\nDatabase Integration for user data\nModeration Tools (kick, ban, mute)\nMusic Playback\nCustomizable Prefix or Slash Commands\nRole Management\nLogging"
+        },
+        "DevOps / Infrastructure": {
+            "techStack": "Terraform, Ansible, Docker, Kubernetes, Python, Go, Bash, PowerShell",
+            "tools": "VS Code, Git, Jenkins, GitHub Actions, CircleCI, AWS CLI, Azure CLI, gcloud",
+            "setup": "1. Clone the repository.\n2. Configure cloud provider credentials (e.g., `aws configure`).\n3. Initialize the configuration (e.g., `terraform init`).\n4. Review the execution plan (e.g., `terraform plan`).\n5. Apply the configuration (e.g., `terraform apply`).",
+            "features": "Infrastructure as Code (IaC)\nAutomated CI/CD Pipelines\nContainer Orchestration with Kubernetes\nConfiguration Management\nCloud Agnostic (or specific to AWS/Azure/GCP)\nMonitoring and Alerting Setup\nSecure Secrets Management (e.g., Vault, AWS Secrets Manager)"
+        },
+        "Smart Contract / Blockchain": {
+            "techStack": "Solidity, Rust, JavaScript, TypeScript, Hardhat, Truffle, Ethers.js, Web3.js",
+            "tools": "VS Code, Git, npm/yarn, Remix IDE, Ganache, Infura, Alchemy",
+            "setup": "1. Clone the repository.\n2. Install dependencies: `npm install`\n3. Compile the smart contracts: `npx hardhat compile`\n4. Run tests on a local network: `npx hardhat test`\n5. Deploy to a testnet (e.g., Rinkeby, Goerli): `npx hardhat run scripts/deploy.js --network goerli`",
+            "features": "Decentralized Application (dApp) logic\nERC20/ERC721/ERC1155 token standards\nOn-chain data storage\nInteraction with other smart contracts\nUpgradable contracts (e.g., using OpenZeppelin proxies)\nGas optimization\nSecurity best practices (e.g., Reentrancy Guard)"
         },
         "Other": {
             "techStack": "Specify your stack here (e.g., Go, Rust, PHP, etc.)",

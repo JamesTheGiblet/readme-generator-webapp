@@ -26,7 +26,7 @@ const formSteps = [
                 id: "projectType",
                 label: "Project Type / Platform (Optional)",
                 type: "select",
-                options: ["", "Web Application", "API / Backend", "Mobile Application", "Desktop Application", "CLI Tool", "Library / Framework", "Data Science Project", "Game", "Browser Extension", "Discord Bot", "Other"],
+                options: ["", "Web Application", "Static Web Application", "React Web Application", "Next.js Web Application", "Vue.js Web Application", "Angular Web Application", "API / Backend", "Mobile Application", "Desktop Application", "CLI Tool", "Library / Framework", "Data Science Project", "Game", "Browser Extension", "Discord Bot", "DevOps / Infrastructure", "Smart Contract / Blockchain", "Other"],
                 required: false,
                 helpText: "What kind of project is this?"
             },
@@ -160,9 +160,9 @@ const formSteps = [
                     };
                     const data = licenseData[value];
                     if (!data) return '';
-                    const badgeUrl = `https://img.shields.io/badge/License-${data.badge.replace(/_/g, '%20').replace(/-/g, '--')}.svg`;
+                    const badgeUrl = `https://img.shields.io/badge/License-${data.badge}.svg`;
                     const licenseUrl = `https://opensource.org/licenses/${data.link}`;
-                    return `[!License: ${value}](${licenseUrl})`;
+                    return `[![License: ${value}](${badgeUrl})](${licenseUrl})`;
                 }
             },
             {
