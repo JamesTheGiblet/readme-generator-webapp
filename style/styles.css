@@ -240,6 +240,13 @@ body {
     transition: background 0.3s ease;
 }
 
+/* Constrain the main generator column on very large screens for better readability */
+.generator-section .col-lg-8 {
+    max-width: 900px;
+    flex: 0 0 auto; /* Prevent flexbox from stretching it beyond its max-width basis */
+    width: 100%; /* Ensure it takes up appropriate width on smaller screens */
+}
+
 .form-container {
     background: var(--card-bg);
     padding: 40px;
@@ -944,4 +951,16 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover {
 
 .tool-switcher .nav-link:not(.active):hover {
     color: var(--text-primary);
+}
+
+/* AI Assist Button */
+.ai-assist-btn {
+    text-decoration: none;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.ai-assist-btn:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
 }
