@@ -1,43 +1,49 @@
 document.addEventListener('DOMContentLoaded', () => {
     /**
-     * Main application entry point.
+     * Fetches and loads data required for the application, like templates and examples.
+     * @returns {Promise<void>}
      */
-    function initializeApp() {
-        // Initialize UI module for all pages (handles theme, navbar, etc.)
-        if (typeof ui !== 'undefined') {
-            ui.init();
+    async function loadAppData() {
+        const fetchFile = async (url) => {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Failed to load: ${url}`);
+            return response.text();
+        };
+    
+        try {
+            const [professional, friendly, concise, professionalEx, friendlyEx, conciseEx] = await Promise.all([
+                fetchFile('templates/professional-readme.md'),
+                fetchFile('templates/friendly-readme.md'),
+                fetchFile('templates/concise-readme.md'),
+                fetchFile('examples/professional-readme.md'),
+                fetchFile('examples/friendly-readme.md'),
+                fetchFile('examples/concise-readme.md')
+            ]);
+    
+            window.APP_DATA.templates = { Professional: professional, Friendly: friendly, Concise: concise };
+            window.APP_DATA.examples = { professional: professionalEx, friendly: friendlyEx, concise: conciseEx };
+    
+        } catch (error) {
+            console.error("Fatal Error: Could not load initial app data.", error);
+            // Optionally, display a user-facing error message on the page
         }
-
-        // Initialize form and API modules only on the main generator page
+    }
+    
+    /**
+     * Initializes the application after all data has been loaded.
+     */
+    async function initializeApp() {
+        await loadAppData(); // Wait for templates and examples to be loaded
+    
+        // Initialize UI components (theme, navbar, etc.) for all pages
+        ui.init();
+    
+        // Initialize form-specific logic only on the main generator page
         if (document.getElementById('readme-form')) {
-            if (typeof form !== 'undefined') form.init();
-            if (typeof api !== 'undefined') api.init();
+            form.init();
+            api.init();
         }
     }
 
     initializeApp();
-
-    // Expose functions needed by other modules/inline scripts
-    // (This part is for actions triggered from the UI module)
-    if (typeof ui !== 'undefined') {
-        ui.copyMarkdown = () => {
-            navigator.clipboard.writeText(form.generatedMarkdown).then(() => {
-                if (ui.copyToast) ui.copyToast.show();
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-            });
-        };
-
-        ui.downloadMarkdown = () => {
-            const blob = new Blob([form.generatedMarkdown], { type: 'text/markdown' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'README.md';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        };
-    }
 });
