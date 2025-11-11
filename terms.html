@@ -6,6 +6,17 @@
     <title>Terms & Conditions | Praximous</title>
     <meta name="description" content="Terms and Conditions for the Praximous README Generator.">
 
+    <!-- SEO & Social Sharing Meta Tags -->
+    <meta property="og:title" content="Terms & Conditions | Praximous">
+    <meta property="og:description" content="Terms and Conditions for the Praximous README Generator.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jamesthegiblet.github.io/readme-generator-webapp/terms.html">
+    <meta property="og:image" content="https://jamesthegiblet.github.io/readme-generator-webapp/assets/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Terms & Conditions | Praximous">
+    <meta name="twitter:description" content="Terms and Conditions for the Praximous README Generator.">
+    <meta name="twitter:image" content="https://jamesthegiblet.github.io/readme-generator-webapp/assets/og-image.png">
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <!-- Bootstrap Icons -->
@@ -27,7 +38,7 @@
                     <li class="nav-item"><a class="nav-link" href="index.html#features">Features</a></li>
                     <li class="nav-item"><a class="nav-link" href="index.html#generator">Generator</a></li>
                     <li class="nav-item">
-                        <button id="theme-toggle" class="theme-toggle" title="Toggle theme">
+                        <button id="theme-toggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle light and dark theme">
                             <i class="bi bi-sun-fill"></i>
                         </button>
                     </li>
@@ -78,17 +89,15 @@
     </footer>
 
     <!-- Back to Top Button -->
-    <a href="#" class="back-to-top-btn" title="Back to top"><i class="bi bi-arrow-up"></i></a>
+    <button class="back-to-top-btn" title="Back to top" aria-label="Scroll to top of the page"><i class="bi bi-arrow-up"></i></button>
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <!-- Marked.js for Markdown Parsing -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>    
     <!-- Custom Scripts -->
-    <script src="core/form-data.js"></script>
-    <script src="core/data.js"></script>
-    <script src="core/engine.js"></script>
-    <script src="main.js"></script>
+    <script src="js/ui.js"></script>
+    <!-- main.js handles initialization for non-generator pages -->
+    <script src="js/main.js"></script>
 </body>
 </html>

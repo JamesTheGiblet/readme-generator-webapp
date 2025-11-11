@@ -111,77 +111,8 @@ window.APP_DATA = {
             "features": "List the main features of your project."
         }
     },
-    examples: {
-        professional: `
-# Project Fusion
-[!License: MIT](https://opensource.org/licenses/MIT)
-## Description
-Project Fusion is an enterprise-grade data orchestration platform designed to streamline complex ETL workflows and provide real-time analytics.
-## Live Demo
-You can view a live demo of the project here: https://example.com/fusion-demo
-## Features
-- Scalable data pipelines for high-volume processing.
-- Real-time monitoring and analytics dashboard.
-- Integration with major cloud providers (AWS, Azure, GCP).
-- Robust error handling and automated retries.
-## Tech Stack
-!Python !Docker !PostgreSQL
-## Getting Started
-### Installation
-1. Clone the repository: \`\`\`sh\ngit clone https://github.com/user/project-fusion.git\n\`\`\`
-2. Navigate to the project directory and install dependencies: \`\`\`sh\ncd project-fusion\npip install -r requirements.txt\n\`\`\`
-3. Set up your \`.env\` file using the \`.env.example\` as a template.
-4. Run database migrations: \`\`\`sh\npython manage.py migrate\n\`\`\`
-## Usage
-Start the development server: \`\`\`sh\npython manage.py runserver\n\`\`\`
-## Contributing
-Contributions are welcome. Please refer to our \`CONTRIBUTING.md\` file for guidelines on how to contribute to this project.
-`,
-        friendly: `
-# 👋 Welcome to Pixel-Pet!
-[!License: GPLv3](https://www.gnu.org/licenses/gpl-3.0)
-Hey there! Thanks for checking out **Pixel-Pet**, a fun little browser game where you can raise your own virtual pet.
-### ✨ Check it out live!
-Want to see it in action? Head over to the live demo: https://example.com/pixel-pet
-### 🚀 What can it do?
-- Feed, play with, and care for your pet.
-- Watch your pet grow and evolve.
-- Earn coins to buy accessories.
-- Fully responsive and works on mobile!
-### 🛠️ Built With
-!JavaScript !HTML5 !CSS3
-### ⚙️ Getting it running
-Just open the \`index.html\` file in your favorite browser! No installation needed.
-### 🤝 Want to contribute?
-We love contributions! If you have an idea for a new feature or found a bug, feel free to open an issue or a pull request.
-`,
-        concise: `
-# Code-Snippets Library
-> A lightweight, zero-dependency library for managing and sharing code snippets.
-[!License: Apache 2.0](https://opensource.org/licenses/Apache-2.0)
-**Live Demo:** https://example.com/code-snippets
-## Features
-- Zero-dependency and tree-shakable.
-- Syntax highlighting support.
-- Simple and intuitive API.
-- TypeScript support out of the box.
-## Tech
-!TypeScript !Vite
-## Installation
-\`\`\`sh
-npm install code-snippets-lib
-\`\`\`
-## Usage
-\`\`\`javascript
-import { getSnippet } from 'code-snippets-lib';
-const mySnippet = getSnippet('javascript', 'console.log("Hello, World!");');
-document.body.innerHTML = mySnippet.html;
-\`\`\`
-`
-    },
-    templates: {
-        'Professional': `# {{projectTitle}}\n\n{{license}}\n\n## Description\n\n{{projectDescription}}\n\n{{#if liveDemoUrl}}\n## Live Demo\n\nYou can view a live demo of the project here: {{liveDemoUrl}}\n{{/if}}\n\n{{#if features}}\n## Features\n\n{{features}}\n{{/if}}\n\n{{#if techStack}}\n## Tech Stack\n\n{{techStack}}\n{{/if}}\n\n{{#if projectTools}}\n### Development Tools\n\n{{projectTools}}\n{{/if}}\n\n{{#if installation}}\n## Getting Started\n\n### Installation\n\n{{installation}}\n{{/if}}\n\n{{#if usage}}\n## Usage\n\n{{usage}}\n{{/if}}\n\n{{#if contributing}}\n## Contributing\n\n{{contributing}}\n{{/if}}\n\n{{#if githubUsername}}\n## Contact\n\nCreated by @{{githubUsername}} - feel free to contact me!\n{{/if}}\n`,
-        'Friendly': `# 👋 Welcome to {{projectTitle}}!\n\n{{license}}\n\nHey there! Thanks for checking out **{{projectTitle}}**.\n\n{{projectDescription}}\n\n{{#if liveDemoUrl}}\n### ✨ Check it out live!\n\nWant to see it in action? Head over to the live demo: {{liveDemoUrl}}\n{{/if}}\n\n{{#if features}}\n### 🚀 What can it do?\n\nHere are some of the cool things this project can do:\n\n{{features}}\n{{/if}}\n\n{{#if techStack}}\n### 🛠️ Built With\n\nThis project was brought to life with these awesome technologies:\n\n{{techStack}}\n{{/if}}\n\n{{#if projectTools}}\nAnd these tools helped along the way:\n\n{{projectTools}}\n{{/if}}\n\n{{#if installation}}\n### ⚙️ Getting it running\n\nReady to get your hands dirty? Here's how you can set it up:\n\n{{installation}}\n{{/if}}\n\n{{#if usage}}\n### 🎮 How to use it\n\n{{usage}}\n{{/if}}\n\n{{#if contributing}}\n### 🤝 Want to contribute?\n\nWe love contributions! If you have an idea, a bug fix, or just want to help out, please check out our contributing guidelines.\n\n{{contributing}}\n{{/if}}\n\n{{#if githubUsername}}\n### 📬 Get in touch\n\nThis project was created by me, @{{githubUsername}}. I'd love to hear from you!\n{{/if}}\n`,
-        'Concise': `# {{projectTitle}}\n\n> {{projectDescription}}\n\n{{license}}\n\n{{#if liveDemoUrl}}\n**Live Demo:** {{liveDemoUrl}}\n{{/if}}\n\n{{#if features}}\n## Features\n\n{{features}}\n{{/if}}\n\n{{#if techStack}}\n## Tech\n\n{{techStack}}\n{{/if}}\n\n{{#if installation}}\n## Installation\n\n{{installation}}\n{{/if}}\n\n{{#if usage}}\n## Usage\n\n{{usage}}\n{{/if}}\n\n{{#if contributing}}\n## Contributing\n\n{{contributing}}\n{{/if}}\n`
-    }
+    // The 'templates' and 'examples' objects will be populated dynamically
+    // by the initialization logic in main.js.
+    templates: {},
+    examples: {}
 };
